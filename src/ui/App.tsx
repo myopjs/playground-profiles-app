@@ -1,6 +1,9 @@
 import { useState, useEffect } from 'react'
 import { MyopComponent } from "@myop/react";
 import { COMPONENTS_IDS } from '../utils/componentsIds';
+import { NavLink, Route, Routes } from 'react-router-dom';
+import {Analytics} from "./Analytics.tsx";
+import {HomePage} from "./HomePage.tsx";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
@@ -45,26 +48,17 @@ function App() {
     )
   }
 
-  return (
-    <div style={{ display: 'flex', width: '100vw', height: '100vh' }}>
-      {/* Sidebar */}
-      <div style={{ width: '280px', height: '100%' }}>
-        <MyopComponent componentId={COMPONENTS_IDS.sidebar} />
+  return (<div style={{ display: 'flex', width: '100vw', height: '100vh' }}>
+          <aside style={{ width: '280px', height: '100%' }}>
+              <MyopComponent componentId={COMPONENTS_IDS.sidebar} />
+          </aside>
+          <main style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
+              <Routes>
+                  <Route path="/" element={<HomePage />} />
+                  <Route path="/analytics" element={<Analytics />} />
+              </Routes>
+          </main>
       </div>
-
-      {/* Main content area */}
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-        {/* Header Insights */}
-        <div style={{ height: '35vh', paddingRight: '24px', paddingLeft: '24px' }}>
-          <MyopComponent componentId={COMPONENTS_IDS.headerInsights} />
-        </div>
-
-        {/* Table */}
-        <div style={{ flex: 1, overflow: 'auto', padding: '0 24px 24px' }}>
-          <MyopComponent componentId={COMPONENTS_IDS.table} />
-        </div>
-      </div>
-    </div>
   )
 }
 
