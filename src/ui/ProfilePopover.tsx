@@ -10,12 +10,17 @@ type ProfilePopoverProps = {
 
 export const ProfilePopover = ({ userData, onClose, onLogout }: ProfilePopoverProps) => {
 
-    const handleCta = (actionId: string) => {
+    const handleCta = (actionId: string, payload?: { componentId?: string }) => {
         if (actionId === 'logout_clicked') {
             onLogout();
         }
         if (actionId === 'click_outside' || actionId === 'escape_pressed') {
             onClose();
+        }
+        if (actionId === 'open_clicked' && payload?.componentId) {
+            const currentUrl = new URL(window.location.href);
+            currentUrl.searchParams.set('cardsComponent', payload.componentId);
+            window.open(currentUrl.toString(), '_blank');
         }
     };
 
