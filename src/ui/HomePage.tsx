@@ -148,10 +148,12 @@ export const HomePage = ({userData}:{ userData: UserData}) => {
                     right: 0,
                     bottom: 0,
                     backgroundColor: isProfileVisible ? 'rgba(0, 0, 0, 0.5)' : 'rgba(0, 0, 0, 0)',
+                    backdropFilter: isProfileVisible ? 'blur(4px)' : 'blur(0px)',
+                    WebkitBackdropFilter: isProfileVisible ? 'blur(4px)' : 'blur(0px)',
                     display: 'flex',
                     justifyContent: 'flex-end',
                     zIndex: 1000,
-                    transition: 'background-color 300ms ease-out',
+                    transition: 'background-color 300ms ease-out, backdrop-filter 300ms ease-out',
                 }}
                 onClick={closeProfile}
             >
