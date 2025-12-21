@@ -1,17 +1,39 @@
-import { useState } from 'react'
-import { MyopComponent } from "@myop/react";
+import { useState, useEffect } from 'react'
+import {MyopComponent, preloadComponents} from "@myop/react";
 import { COMPONENTS_IDS } from '../utils/componentsIds';
-import { Route, Routes } from 'react-router-dom';
+import { Route, Routes, useNavigate } from 'react-router-dom';
 import {Analytics} from "./Analytics.tsx";
 import {HomePage} from "./HomePage.tsx";
 import {SideBar} from "./SideBar.tsx";
+import {getRandomUser, type UserData} from "../data/mockUsers.ts";
 
 function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [currentUser, setCurrentUser] = useState<UserData | null>(null);
+  const [donePreload, setDonePreload] = useState(false);
+  const navigate = useNavigate();
 
-  const handleSignIn = () => setIsAuthenticated(true);
+    const handleSignIn = () => setCurrentUser(getRandomUser());
 
-  if (!isAuthenticated) {
+    const handleLogout = () => setCurrentUser(null);
+
+    const handleNavigate = (navId: string) => {
+        if (navId === 'home') {
+            navigate('/');
+        } else if (navId === 'analytics') {
+            navigate('/analytics');
+        }
+    };
+
+    useEffect(() => {
+        preloadComponents(Object.values(COMPONENTS_IDS), 'production').then(() => setDonePreload(true));
+    }, [])
+
+
+    if(!donePreload) {
+        return (<div/>)
+    }
+
+  if (!currentUser) {
 
     return (<div style={{ height: '100vh', width: '100vw' }}>
         <MyopComponent
@@ -28,12 +50,12 @@ function App() {
   }
 
   return (<div style={{ display: 'flex', width: '100vw', height: '100vh' }}>
-          <aside style={{ width: '280px', height: '100%' }}>
-             <SideBar/>
+          <aside style={{ width: '280px', height: '100%', position: 'relative' }}>
+             <SideBar userData={currentUser} onLogout={handleLogout} onNavigate={handleNavigate} />
           </aside>
           <main style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
               <Routes>
-                  <Route path="/" element={<HomePage />} />
+                  <Route path="/" element={<HomePage userData={currentUser} />} />
                   <Route path="/analytics" element={<Analytics />} />
               </Routes>
           </main>

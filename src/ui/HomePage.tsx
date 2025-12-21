@@ -2,8 +2,10 @@ import {MyopComponent} from "@myop/react";
 import {COMPONENTS_IDS} from "../utils/componentsIds.ts";
 import {useState} from "react";
 import {teamMembersData, type TeamMember} from '../data/teamMembers.ts';
+import type {UserData} from "../data/mockUsers.ts";
 
-export const HomePage = () => {
+
+export const HomePage = ({userData}:{ userData: UserData}) => {
 
     const [view, setView] = useState('table')
     const [selectedMember, setSelectedMember] = useState<TeamMember | null>(null)
@@ -46,7 +48,7 @@ export const HomePage = () => {
     return  <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
         {/* Header Insights */}
         <div style={{ height: '35vh', paddingRight: '24px', paddingLeft: '24px' }}>
-            <MyopComponent componentId={COMPONENTS_IDS.headerInsights} />
+            <MyopComponent componentId={COMPONENTS_IDS.headerInsights} data={{ userName: userData.name}} />
         </div>
 
         {/* Content Header */}
