@@ -58,6 +58,11 @@ export const HomePage = ({userData}:{ userData: UserData}) => {
             profileImage: member.profileImage,
             avatarColor: member.avatarColor,
             badge: member.role,
+            email: member.email,
+            phone: member.phone,
+            about: member.about,
+            relationship: member.relationship,
+            relationshipType: member.relationshipType,
         },
         isEditing: false
     });
