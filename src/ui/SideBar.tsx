@@ -2,7 +2,7 @@ import {MyopComponent} from "@myop/react";
 import {COMPONENTS_IDS} from "../utils/componentsIds.ts";
 import {type UserData} from "../data/mockUsers.ts";
 import {ProfilePopover} from "./ProfilePopover.tsx";
-import {useState} from "react";
+import {useState, useEffect} from "react";
 
 type SideBarProps = {
     userData: UserData;
@@ -11,7 +11,19 @@ type SideBarProps = {
 }
 
 export const SideBar = ({ userData, onLogout, onNavigate }: SideBarProps) => {
-    const [showPopover, setShowPopover] = useState(false);
+    const [isOpen, setIsOpen] = useState(false);
+    const [isVisible, setIsVisible] = useState(false);
+
+    useEffect(() => {
+        if (isOpen) {
+            requestAnimationFrame(() => setIsVisible(true));
+        }
+    }, [isOpen]);
+
+    const closePopover = () => {
+        setIsVisible(false);
+        setTimeout(() => setIsOpen(false), 200);
+    };
 
     const sidebarUserData = {
         name: userData.name,
@@ -21,8 +33,9 @@ export const SideBar = ({ userData, onLogout, onNavigate }: SideBarProps) => {
     };
 
     const handleCta = (actionId: string, payload: any) => {
+        console.log('SideBar CTA:', actionId, payload);
         if (actionId === 'profile_clicked') {
-            setShowPopover(true);
+            setIsOpen(true);
         }
         if (actionId === 'nav_clicked' && payload?.navId) {
             onNavigate(payload.navId);
@@ -35,19 +48,36 @@ export const SideBar = ({ userData, onLogout, onNavigate }: SideBarProps) => {
             data={{ userData: sidebarUserData }}
             on={handleCta as any}
         />
-        {showPopover && (
-            <div style={{
-                position: 'absolute',
-                bottom: '70px',
-                left: '16px',
-                zIndex: 1000
-            }}>
-                <ProfilePopover
-                    userData={userData}
-                    onClose={() => setShowPopover(false)}
-                    onLogout={onLogout}
+        {isOpen && (
+            <>
+                <div
+                    style={{
+                        position: 'fixed',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        zIndex: 9998,
+                        opacity: isVisible ? 1 : 0,
+                        transition: 'opacity 200ms ease-out'
+                    }}
+                    onClick={closePopover}
                 />
-            </div>
+                <div style={{
+                    position: 'fixed',
+                    bottom: '80px',
+                    left: '150px',
+                    zIndex: 9999,
+                    opacity: isVisible ? 1 : 0,
+                    transition: 'opacity 200ms ease-out'
+                }}>
+                    <ProfilePopover
+                        userData={userData}
+                        onClose={closePopover}
+                        onLogout={onLogout}
+                    />
+                </div>
+            </>
         )}
     </>
 }

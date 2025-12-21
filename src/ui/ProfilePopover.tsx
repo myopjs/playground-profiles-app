@@ -19,9 +19,11 @@ export const ProfilePopover = ({ userData, onClose, onLogout }: ProfilePopoverPr
         }
     };
 
-    return <MyopComponent
-        componentId={COMPONENTS_IDS.profilePopover}
-        data={{ userData }}
-        on={handleCta as any}
-    />
+    return <div style={{ width: '300px', height: '350px' }}>
+        <MyopComponent
+            componentId={COMPONENTS_IDS.profilePopover}
+            data={{ userData }}
+            on={handleCta as any}
+        />
+    </div>
 }
