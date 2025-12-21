@@ -1,6 +1,6 @@
 import {MyopComponent} from "@myop/react";
 import {COMPONENTS_IDS} from "../utils/componentsIds.ts";
-import {useState} from "react";
+import {useState, useEffect} from "react";
 import {teamMembersData, type TeamMember} from '../data/teamMembers.ts';
 import type {UserData} from "../data/mockUsers.ts";
 
@@ -9,6 +9,23 @@ export const HomePage = ({userData}:{ userData: UserData}) => {
 
     const [view, setView] = useState('table')
     const [selectedMember, setSelectedMember] = useState<TeamMember | null>(null)
+    const [isProfileOpen, setIsProfileOpen] = useState(false)
+    const [isProfileVisible, setIsProfileVisible] = useState(false)
+
+    useEffect(() => {
+        if (selectedMember) {
+            setIsProfileOpen(true);
+            requestAnimationFrame(() => setIsProfileVisible(true));
+        }
+    }, [selectedMember]);
+
+    const closeProfile = () => {
+        setIsProfileVisible(false);
+        setTimeout(() => {
+            setIsProfileOpen(false);
+            setSelectedMember(null);
+        }, 300);
+    };
 
     const handleCta = (action: string, payload: any) => {
         if (action === 'view-changed' && payload) {
@@ -24,7 +41,7 @@ export const HomePage = ({userData}:{ userData: UserData}) => {
 
     const handleEditProfileCta = (action: string) => {
         if (action === 'close') {
-            setSelectedMember(null);
+            closeProfile();
         }
     };
 
@@ -67,7 +84,7 @@ export const HomePage = ({userData}:{ userData: UserData}) => {
         </div>
 
         {/* Edit Profile Modal */}
-        {selectedMember && (
+        {isProfileOpen && selectedMember && (
             <div
                 style={{
                     position: 'fixed',
@@ -75,18 +92,21 @@ export const HomePage = ({userData}:{ userData: UserData}) => {
                     left: 0,
                     right: 0,
                     bottom: 0,
-                    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                    backgroundColor: isProfileVisible ? 'rgba(0, 0, 0, 0.5)' : 'rgba(0, 0, 0, 0)',
                     display: 'flex',
                     justifyContent: 'flex-end',
                     zIndex: 1000,
+                    transition: 'background-color 300ms ease-out',
                 }}
-                onClick={() => setSelectedMember(null)}
+                onClick={closeProfile}
             >
                 <div
                     style={{
                         width: '384px',
                         height: '100%',
                         backgroundColor: '#fff',
+                        transform: isProfileVisible ? 'translateX(0)' : 'translateX(100%)',
+                        transition: 'transform 300ms ease-out',
                     }}
                     onClick={(e) => e.stopPropagation()}
                 >
