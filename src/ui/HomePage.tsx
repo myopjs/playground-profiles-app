@@ -1,6 +1,7 @@
 import {MyopComponent} from "@myop/react";
 import {COMPONENTS_IDS} from "../utils/componentsIds.ts";
 import {useState} from "react";
+import {teamMembersData} from '../data/teamMembers.ts';
 
 export const HomePage = () => {
 
@@ -29,8 +30,8 @@ export const HomePage = () => {
         </div>
         <div style={{ flex: 1, overflow: 'auto', padding: '0 24px 24px' }}>
             { view === 'table' ?
-                <MyopComponent componentId={COMPONENTS_IDS.table} />:
-                <MyopComponent componentId={COMPONENTS_IDS.cardsView} />
+                <MyopComponent componentId={COMPONENTS_IDS.table} data={teamMembersData} />:
+                <MyopComponent componentId={COMPONENTS_IDS.cardsView} data={teamMembersData} />
             }
         </div>
     </div>
