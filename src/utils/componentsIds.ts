@@ -6,5 +6,6 @@ export const COMPONENTS_IDS = {
     cardsView: '46ecb98c-997c-4dc4-97f7-3c7fddc186d6', //cardsView.html
     profilePopover: '62d87571-6985-4a1b-9ced-53374f89da05', //profilePopover.html
     tableHeader: '5a57bdf8-14b0-4089-93f1-cdccdf861c95', //tableHeader.html
-    editProfile: 'a45c1a88-4f8c-418d-9c56-34b72e815edc' //editProfile.html
+    editProfile: 'a45c1a88-4f8c-418d-9c56-34b72e815edc', //editProfile.html
+    analytics: 'ca9af721-7efd-441b-aba6-fd3afad1e4ea' //analytics.html
 }

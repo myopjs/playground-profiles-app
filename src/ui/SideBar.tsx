@@ -6,11 +6,12 @@ import {useState, useEffect} from "react";
 
 type SideBarProps = {
     userData: UserData;
+    activeNavItem: string;
     onLogout: () => void;
     onNavigate: (navId: string) => void;
 }
 
-export const SideBar = ({ userData, onLogout, onNavigate }: SideBarProps) => {
+export const SideBar = ({ userData, activeNavItem, onLogout, onNavigate }: SideBarProps) => {
     const [isOpen, setIsOpen] = useState(false);
     const [isVisible, setIsVisible] = useState(false);
 
@@ -45,7 +46,7 @@ export const SideBar = ({ userData, onLogout, onNavigate }: SideBarProps) => {
     return <>
         <MyopComponent
             componentId={COMPONENTS_IDS.sidebar}
-            data={{ userData: sidebarUserData }}
+            data={{ userData: sidebarUserData, activeNavItem }}
             on={handleCta as any}
         />
         {isOpen && (

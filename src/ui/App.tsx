@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import {MyopComponent, preloadComponents} from "@myop/react";
 import { COMPONENTS_IDS } from '../utils/componentsIds';
-import { Route, Routes, useNavigate } from 'react-router-dom';
+import { Route, Routes, useNavigate, useLocation } from 'react-router-dom';
 import {Analytics} from "./Analytics.tsx";
 import {HomePage} from "./HomePage.tsx";
 import {SideBar} from "./SideBar.tsx";
@@ -11,6 +11,9 @@ function App() {
   const [currentUser, setCurrentUser] = useState<UserData | null>(null);
   const [donePreload, setDonePreload] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const activeNavItem = location.pathname === '/analytics' ? 'analytics' : 'home';
 
     const handleSignIn = () => setCurrentUser(getRandomUser());
 
@@ -51,7 +54,7 @@ function App() {
 
   return (<div style={{ display: 'flex', width: '100vw', height: '100vh' }}>
           <aside style={{ width: '280px', height: '100%', position: 'relative' }}>
-             <SideBar userData={currentUser} onLogout={handleLogout} onNavigate={handleNavigate} />
+             <SideBar userData={currentUser} activeNavItem={activeNavItem} onLogout={handleLogout} onNavigate={handleNavigate} />
           </aside>
           <main style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
               <Routes>
