@@ -118,7 +118,7 @@ export const HomePage = ({userData}:{ userData: UserData}) => {
 
     return  <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
         {/* Header Insights */}
-        <div style={{ height: '35vh', paddingRight: '24px', paddingLeft: '24px' }}>
+        <div style={{ height: '244px', paddingRight: '24px', paddingLeft: '24px' }}>
             <MyopComponent componentId={COMPONENTS_IDS.headerInsights} data={{ userName: userData.name}} />
         </div>
 
