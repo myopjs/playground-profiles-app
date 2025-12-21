@@ -7,17 +7,29 @@ import {HomePage} from "./HomePage.tsx";
 import {SideBar} from "./SideBar.tsx";
 import {getRandomUser, type UserData} from "../data/mockUsers.ts";
 
+const SESSION_STORAGE_KEY = 'currentUser';
+
 function App() {
-  const [currentUser, setCurrentUser] = useState<UserData | null>(null);
+  const [currentUser, setCurrentUser] = useState<UserData | null>(() => {
+    const savedUser = sessionStorage.getItem(SESSION_STORAGE_KEY);
+    return savedUser ? JSON.parse(savedUser) : null;
+  });
   const [donePreload, setDonePreload] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
 
   const activeNavItem = location.pathname === '/analytics' ? 'analytics' : 'home';
 
-    const handleSignIn = () => setCurrentUser(getRandomUser());
+    const handleSignIn = () => {
+      const user = getRandomUser();
+      sessionStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(user));
+      setCurrentUser(user);
+    };
 
-    const handleLogout = () => setCurrentUser(null);
+    const handleLogout = () => {
+      sessionStorage.removeItem(SESSION_STORAGE_KEY);
+      setCurrentUser(null);
+    };
 
     const handleNavigate = (navId: string) => {
         if (navId === 'home') {
