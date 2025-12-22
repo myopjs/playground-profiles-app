@@ -94,6 +94,48 @@ Analytics dashboard component displaying:
 - Generation and distribution insights
 - Back navigation to home
 
+## Component Override via Query Params
+
+You can override any Myop component at runtime by adding query parameters to the URL. This is useful for testing alternative component implementations or previewing new versions.
+
+### Available Query Parameters
+
+| Query Param | Default Component | Description |
+|-------------|-------------------|-------------|
+| `signup` | Signup page | Authentication component |
+| `table` | Team members table | Table view of team members |
+| `headerInsights` | Header insights | Welcome header with stats |
+| `sidebar` | Navigation sidebar | Left navigation menu |
+| `cardsView` | Cards view | Grid layout of member cards |
+| `profilePopover` | Profile popover | User profile dropdown menu |
+| `tableHeader` | Table header | View toggle controls |
+| `editProfile` | Edit profile modal | Profile editing form |
+| `analytics` | Analytics dashboard | Team analytics page |
+
+### Usage
+
+To override a component, add the query parameter with the custom component ID:
+
+```
+http://localhost:5173/?table=your-custom-component-id
+```
+
+You can override multiple components at once:
+
+```
+http://localhost:5173/?table=custom-table-id&sidebar=custom-sidebar-id
+```
+
+### Example
+
+To test a new version of the header insights component:
+
+```
+http://localhost:5173/?headerInsights=abc123-new-header-component-id
+```
+
+The application will use the custom component ID instead of the default one. If the query parameter is not present or empty, it falls back to the default component.
+
 ## Tech Stack
 
 - React 18

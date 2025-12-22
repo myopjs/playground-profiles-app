@@ -1,5 +1,5 @@
 import {MyopComponent} from "@myop/react";
-import {COMPONENTS_IDS} from "../utils/componentsIds.ts";
+import {getComponentId, QUERY_PARAMS} from "../utils/queryParams.ts";
 import {useState, useEffect, useCallback} from "react";
 import {useNavigate} from "react-router-dom";
 import {teamMembersData, type TeamMember} from '../data/teamMembers.ts';
@@ -137,7 +137,7 @@ export const HomePage = ({userData}:{ userData: UserData}) => {
         {/* Header Insights */}
         <div style={{ height: '244px', paddingRight: '24px', paddingLeft: '24px' }}>
             <MyopComponent
-                componentId={COMPONENTS_IDS.headerInsights}
+                componentId={getComponentId(QUERY_PARAMS.headerInsights)}
                 data={{ userName: userData.name}}
                 on={handleHeaderInsightsCta as any}
             />
@@ -146,7 +146,7 @@ export const HomePage = ({userData}:{ userData: UserData}) => {
         {/* Content Header */}
         <div style={{  paddingRight: '24px', paddingLeft: '24px', paddingBottom: '16px', height: '40px' }} >
             <MyopComponent
-                componentId={COMPONENTS_IDS.tableHeader}
+                componentId={getComponentId(QUERY_PARAMS.tableHeader)}
                 on={handleCta as any}
             />
 
@@ -154,8 +154,8 @@ export const HomePage = ({userData}:{ userData: UserData}) => {
         <div style={{ flex: 1, overflow: 'auto', padding: '0 24px 24px' }}>
             {isTableReady && (
                 view === 'table' ?
-                    <MyopComponent key={`table-v${membersVersion}`} componentId={COMPONENTS_IDS.table} data={members} on={handleMemberClick as any} />:
-                    <MyopComponent key={`cards-v${membersVersion}`} componentId={COMPONENTS_IDS.cardsView} data={members} on={handleMemberClick as any} />
+                    <MyopComponent key={`table-v${membersVersion}`} componentId={getComponentId(QUERY_PARAMS.table)} data={members} on={handleMemberClick as any} />:
+                    <MyopComponent key={`cards-v${membersVersion}`} componentId={getComponentId(QUERY_PARAMS.cardsView)} data={members} on={handleMemberClick as any} />
             )}
         </div>
 
@@ -189,7 +189,7 @@ export const HomePage = ({userData}:{ userData: UserData}) => {
                     onClick={(e) => e.stopPropagation()}
                 >
                     <MyopComponent
-                        componentId={COMPONENTS_IDS.editProfile}
+                        componentId={getComponentId(QUERY_PARAMS.editProfile)}
                         data={mapMemberToProfile(selectedMember)}
                         on={handleEditProfileCta as any}
                     />

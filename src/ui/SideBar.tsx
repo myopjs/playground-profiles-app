@@ -1,5 +1,5 @@
 import {MyopComponent} from "@myop/react";
-import {COMPONENTS_IDS} from "../utils/componentsIds.ts";
+import {getComponentId, QUERY_PARAMS} from "../utils/queryParams.ts";
 import {type UserData} from "../data/mockUsers.ts";
 import {ProfilePopover} from "./ProfilePopover.tsx";
 import {useState, useEffect} from "react";
@@ -45,7 +45,7 @@ export const SideBar = ({ userData, activeNavItem, onLogout, onNavigate }: SideB
 
     return <>
         <MyopComponent
-            componentId={COMPONENTS_IDS.sidebar}
+            componentId={getComponentId(QUERY_PARAMS.sidebar)}
             data={{ userData: sidebarUserData, activeNavItem }}
             on={handleCta as any}
         />

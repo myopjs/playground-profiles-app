@@ -1,6 +1,6 @@
 import {useState, useCallback} from "react";
 import {MyopComponent} from "@myop/react";
-import {COMPONENTS_IDS} from "../utils/componentsIds.ts";
+import {getComponentId, QUERY_PARAMS} from "../utils/queryParams.ts";
 import {type UserData} from "../data/mockUsers.ts";
 import {Toast} from "./Toast.tsx";
 
@@ -24,7 +24,7 @@ export const ProfilePopover = ({ userData, onClose, onLogout }: ProfilePopoverPr
         }
         if (actionId === 'open_clicked' && payload?.componentId) {
             const currentUrl = new URL(window.location.href);
-            currentUrl.searchParams.set('cardsComponent', payload.componentId);
+            currentUrl.searchParams.set(QUERY_PARAMS.cardsView, payload.componentId);
             window.open(currentUrl.toString(), '_blank');
         }
         if (actionId === 'settings_clicked') {
@@ -35,7 +35,7 @@ export const ProfilePopover = ({ userData, onClose, onLogout }: ProfilePopoverPr
     return <>
         <div style={{ width: '300px', height: '350px' }}>
             <MyopComponent
-                componentId={COMPONENTS_IDS.profilePopover}
+                componentId={getComponentId(QUERY_PARAMS.profilePopover)}
                 data={{ userData }}
                 on={handleCta as any}
             />

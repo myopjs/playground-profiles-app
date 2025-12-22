@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import {MyopComponent, preloadComponents} from "@myop/react";
 import { COMPONENTS_IDS } from '../utils/componentsIds';
+import { getComponentId, QUERY_PARAMS } from '../utils/queryParams';
 import { Route, Routes, useNavigate, useLocation } from 'react-router-dom';
 import {Analytics} from "./Analytics.tsx";
 import {HomePage} from "./HomePage.tsx";
@@ -52,7 +53,7 @@ function App() {
 
     return (<div style={{ height: '100vh', width: '100vw' }}>
         <MyopComponent
-          componentId={COMPONENTS_IDS.signup}
+          componentId={getComponentId(QUERY_PARAMS.signup)}
           on={(actionId: string) => {
             if (actionId === 'google_signin' || actionId === 'email_signin' ||
                 actionId === 'google_signup' || actionId === 'email_signup') {
