@@ -50,6 +50,8 @@ export const HomePage = ({userData}:{ userData: UserData}) => {
         }, 300);
     };
 
+    const [headerInsightsAction, setHeaderInsightsAction] = useState<{ action: string } | null>(null);
+
     const handleHeaderInsightsCta = (action: string, payload: any) => {
         if (action === 'action_clicked') {
             if (payload?.action === 'viewHighlights') {
@@ -57,6 +59,12 @@ export const HomePage = ({userData}:{ userData: UserData}) => {
             }
             if (payload?.action === 'addMember') {
                 setToastOpen(true);
+            }
+            if (payload?.action === 'shareTeam') {
+                navigator.clipboard.writeText(window.location.href).then(() => {
+                    setHeaderInsightsAction({ action: 'showShareCopied' });
+                    setTimeout(() => setHeaderInsightsAction(null), 100);
+                });
             }
         }
     };
@@ -138,7 +146,7 @@ export const HomePage = ({userData}:{ userData: UserData}) => {
         <div style={{ height: '244px', paddingRight: '24px', paddingLeft: '24px' }}>
             <MyopComponent
                 componentId={getComponentId(QUERY_PARAMS.headerInsights)}
-                data={{ userName: userData.name}}
+                data={{ userName: userData.name, ...headerInsightsAction }}
                 on={handleHeaderInsightsCta as any}
             />
         </div>
