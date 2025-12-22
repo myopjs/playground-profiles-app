@@ -233,13 +233,18 @@ interface ProfilePopoverInitData {
   };
   config?: {
     isVisible?: boolean;
-    showComponentInput?: boolean;
   };
-  componentId?: string;
+  selectedComponent?: string;  // Component to override (e.g., 'Table', 'Sidebar')
+  componentId?: string;        // Custom component ID
 }
+
+// Available components for override:
+// 'Signup', 'Sidebar', 'Profile Popover', 'Header Insights',
+// 'Table Header', 'Table', 'Cards View', 'Edit Profile', 'Analytics'
 
 // Actions:
 // - 'setUserData': payload = userData object
+// - 'setSelectedComponent': payload = component name string
 // - 'setComponentId': payload = string
 // - 'show': no payload
 // - 'hide': no payload
@@ -250,9 +255,10 @@ interface ProfilePopoverInitData {
 
 | Action | Payload |
 |--------|---------|
+| `component_selected` | `{ component: string }` |
+| `open_clicked` | `{ componentId: string, selectedComponent: string }` |
 | `settings_clicked` | `{}` |
 | `logout_clicked` | `{}` |
-| `open_clicked` | `{ componentId: string }` |
 | `click_outside` | `{}` |
 | `escape_pressed` | `{}` |
 

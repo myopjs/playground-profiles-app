@@ -15,16 +15,16 @@ export const ProfilePopover = ({ userData, onClose, onLogout }: ProfilePopoverPr
 
     const closeToast = useCallback(() => setToastOpen(false), []);
 
-    const handleCta = (actionId: string, payload?: { componentId?: string }) => {
+    const handleCta = (actionId: string, payload?: { componentId?: string; selectedComponent?: string }) => {
         if (actionId === 'logout_clicked') {
             onLogout();
         }
         if (actionId === 'click_outside' || actionId === 'escape_pressed') {
             onClose();
         }
-        if (actionId === 'open_clicked' && payload?.componentId) {
+        if (actionId === 'open_clicked' && payload?.componentId && payload?.selectedComponent) {
             const currentUrl = new URL(window.location.href);
-            currentUrl.searchParams.set(QUERY_PARAMS.cardsView, payload.componentId);
+            currentUrl.searchParams.set(payload.selectedComponent, payload.componentId);
             window.open(currentUrl.toString(), '_blank');
         }
         if (actionId === 'settings_clicked') {
@@ -33,7 +33,7 @@ export const ProfilePopover = ({ userData, onClose, onLogout }: ProfilePopoverPr
     };
 
     return <>
-        <div style={{ width: '300px', height: '350px' }}>
+        <div style={{ width: '300px', height: '500px' }}>
             <MyopComponent
                 componentId={getComponentId(QUERY_PARAMS.profilePopover)}
                 data={{ userData }}

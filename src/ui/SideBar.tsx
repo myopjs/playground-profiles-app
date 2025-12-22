@@ -66,8 +66,8 @@ export const SideBar = ({ userData, activeNavItem, onLogout, onNavigate }: SideB
                 />
                 <div style={{
                     position: 'fixed',
-                    bottom: '80px',
-                    left: '150px',
+                    bottom: '10px',
+                    left: '100px',
                     zIndex: 9999,
                     opacity: isVisible ? 1 : 0,
                     transition: 'opacity 200ms ease-out'
