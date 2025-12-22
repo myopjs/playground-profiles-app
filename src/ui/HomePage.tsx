@@ -1,6 +1,6 @@
 import {MyopComponent} from "@myop/react";
 import {getComponentId, QUERY_PARAMS} from "../utils/queryParams.ts";
-import {useState, useEffect, useCallback} from "react";
+import {useState, useEffect, useCallback, useMemo} from "react";
 import {useNavigate} from "react-router-dom";
 import {teamMembersData, type TeamMember} from '../data/teamMembers.ts';
 import type {UserData} from "../data/mockUsers.ts";
@@ -20,6 +20,18 @@ export const HomePage = ({userData}:{ userData: UserData}) => {
     const [toastOpen, setToastOpen] = useState(false)
 
     const closeToast = useCallback(() => setToastOpen(false), []);
+
+    const headerStats = useMemo(() => {
+        const totalExperience = members.reduce((sum, m) => sum + parseFloat(m.experience), 0);
+        const avgExperience = (totalExperience / members.length).toFixed(1);
+        const allSkills = new Set(members.flatMap(m => m.skills));
+        return {
+            experience: { value: `${avgExperience} yrs`, label: 'Avg Experience' },
+            members: { value: members.length, label: 'Members' },
+            skills: { value: allSkills.size, label: 'Skills' },
+            projects: { value: 23, label: 'Projects' }
+        };
+    }, [members]);
 
     useEffect(() => {
         if (selectedMember) {
@@ -146,7 +158,7 @@ export const HomePage = ({userData}:{ userData: UserData}) => {
         <div style={{ height: '244px', paddingRight: '24px', paddingLeft: '24px' }}>
             <MyopComponent
                 componentId={getComponentId(QUERY_PARAMS.headerInsights)}
-                data={{ userName: userData.name, ...headerInsightsAction }}
+                data={{ userName: userData.name, stats: headerStats, ...headerInsightsAction }}
                 on={handleHeaderInsightsCta as any}
             />
         </div>
