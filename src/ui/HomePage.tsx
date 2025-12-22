@@ -1,11 +1,14 @@
 import {MyopComponent} from "@myop/react";
 import {COMPONENTS_IDS} from "../utils/componentsIds.ts";
-import {useState, useEffect} from "react";
+import {useState, useEffect, useCallback} from "react";
+import {useNavigate} from "react-router-dom";
 import {teamMembersData, type TeamMember} from '../data/teamMembers.ts';
 import type {UserData} from "../data/mockUsers.ts";
+import {Toast} from "./Toast.tsx";
 
 
 export const HomePage = ({userData}:{ userData: UserData}) => {
+    const navigate = useNavigate();
 
     const [view, setView] = useState('table')
     const [members, setMembers] = useState<TeamMember[]>(teamMembersData)
@@ -14,6 +17,9 @@ export const HomePage = ({userData}:{ userData: UserData}) => {
     const [selectedMember, setSelectedMember] = useState<TeamMember | null>(null)
     const [isProfileOpen, setIsProfileOpen] = useState(false)
     const [isProfileVisible, setIsProfileVisible] = useState(false)
+    const [toastOpen, setToastOpen] = useState(false)
+
+    const closeToast = useCallback(() => setToastOpen(false), []);
 
     useEffect(() => {
         if (selectedMember) {
@@ -42,6 +48,17 @@ export const HomePage = ({userData}:{ userData: UserData}) => {
             setIsProfileOpen(false);
             setSelectedMember(null);
         }, 300);
+    };
+
+    const handleHeaderInsightsCta = (action: string, payload: any) => {
+        if (action === 'action_clicked') {
+            if (payload?.action === 'viewHighlights') {
+                navigate('/analytics');
+            }
+            if (payload?.action === 'addMember') {
+                setToastOpen(true);
+            }
+        }
     };
 
     const handleCta = (action: string, payload: any) => {
@@ -119,7 +136,11 @@ export const HomePage = ({userData}:{ userData: UserData}) => {
     return  <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
         {/* Header Insights */}
         <div style={{ height: '244px', paddingRight: '24px', paddingLeft: '24px' }}>
-            <MyopComponent componentId={COMPONENTS_IDS.headerInsights} data={{ userName: userData.name}} />
+            <MyopComponent
+                componentId={COMPONENTS_IDS.headerInsights}
+                data={{ userName: userData.name}}
+                on={handleHeaderInsightsCta as any}
+            />
         </div>
 
         {/* Content Header */}
@@ -175,5 +196,11 @@ export const HomePage = ({userData}:{ userData: UserData}) => {
                 </div>
             </div>
         )}
+
+        <Toast
+            message="Add Member feature coming soon!"
+            isOpen={toastOpen}
+            onClose={closeToast}
+        />
     </div>
 }
