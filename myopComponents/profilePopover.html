@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="myop:size" content='{"width":300,"height":200}'>
+    <title>Profile Popover</title>
+    <link
+            href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap"
+            rel="stylesheet">
+    <script type="myop/types">
+        // =============================================================================
+        // MYOP COMPONENT TYPE DEFINITIONS
+        // =============================================================================
+
+        /**
+         * Data structure passed to myop_init_interface(data)
+         */
+        interface MyopInitData {
+            userData: {
+                name: string;
+                email: string;
+                initials: string;
+                profileImage?: string | null;
+            };
+            config: {
+                isVisible: boolean;
+            };
+            isMobileView?: boolean;
+        }
+
+        /**
+         * Actions and payloads for myop_cta_handler(action, payload)
+         */
+        interface MyopCtaPayloads {
+            'click_outside': {};
+            'escape_pressed': {};
+            'logout_clicked': {};
+            'drag_closed': {};
+        }
+
+        // =============================================================================
+        // DO NOT EDIT BELOW - Standard Myop type declarations
+        // =============================================================================
+
+        declare function myop_init_interface(): MyopInitData;
+        declare function myop_init_interface(data: MyopInitData): void;
+
+        declare function myop_cta_handler<K extends keyof MyopCtaPayloads>(
+            action: K,
+            payload: MyopCtaPayloads[K]
+        ): void;
+    </script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            overflow: visible;
+            background: transparent;
+            font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        html::-webkit-scrollbar,
+        body::-webkit-scrollbar {
+            display: none;
+        }
+
+        html,
+        body {
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        /* Hidden until initialized (prevents desktop flash on mobile) */
+        #app-root {
+            opacity: 0;
+        }
+
+        /* Desktop: show immediately when initialized */
+        body.desktop-view #app-root.initialized {
+            opacity: 1;
+        }
+
+        /* Mobile: show with slide-up animation when initialized */
+        body.mobile-view #app-root.initialized {
+            opacity: 1;
+        }
+
+        body.mobile-view .popover-container {
+            transform: translateY(100%);
+            transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+        }
+
+        body.mobile-view #app-root.initialized .popover-container {
+            transform: translateY(0);
+        }
+
+        .popover-container {
+            width: 300px;
+            background: #ffffff;
+            border-radius: 18px;
+            border: 1px solid #e5e7eb;
+            padding: 24px 20px;
+            position: relative;
+            z-index: 1000;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .popover-container.hidden {
+            display: none;
+        }
+
+        .popover-header {
+            text-align: center;
+            margin-bottom: 16px;
+        }
+
+        .avatar {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: #fde047;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: 600;
+            color: #111827;
+            margin: 0 auto 14px;
+            flex-shrink: 0;
+            overflow: hidden;
+            letter-spacing: -0.3px;
+        }
+
+        .avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .user-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 4px;
+            letter-spacing: -0.3px;
+        }
+
+        .user-email {
+            font-size: 13px;
+            color: #6b7280;
+            letter-spacing: -0.1px;
+        }
+
+        .divider {
+            height: 1px;
+            background: #e5e7eb;
+            margin: 16px 0;
+        }
+
+        .menu-item {
+            appearance: none;
+            border: none;
+            background: transparent;
+            width: 100%;
+            text-align: left;
+            padding: 8px 10px;
+            border-radius: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 15px;
+            color: #111827;
+            font-weight: 400;
+            transition: background 0.15s ease;
+            font-family: inherit;
+        }
+
+        .menu-item:hover {
+            background: #f9fafb;
+        }
+
+        .menu-item:active {
+            transform: scale(0.98);
+        }
+
+        .menu-item:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(94, 234, 212, 0.4);
+        }
+
+        .menu-icon {
+            width: 16px;
+            height: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .menu-icon svg {
+            width: 16px;
+            height: 16px;
+            display: block;
+        }
+
+        /* Mobile Styles - Bottom Sheet (applied via isMobileView prop) */
+        body.mobile-view {
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            height: 100%;
+        }
+
+        body.mobile-view #app-root {
+            width: 100%;
+        }
+
+        body.mobile-view .popover-container {
+            width: 100%;
+            max-width: 100%;
+            border-radius: 20px 20px 0 0;
+            padding: 20px 20px 28px;
+            border-bottom: none;
+            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Drag handle indicator */
+        body.mobile-view .popover-container::before {
+            content: '';
+            display: block;
+            width: 36px;
+            height: 4px;
+            background: #d1d5db;
+            border-radius: 2px;
+            margin: 0 auto 16px;
+        }
+
+        body.mobile-view .popover-header {
+            margin-bottom: 14px;
+        }
+
+        body.mobile-view .avatar {
+            width: 52px;
+            height: 52px;
+            font-size: 17px;
+            margin-bottom: 12px;
+        }
+
+        body.mobile-view .user-name {
+            font-size: 17px;
+        }
+
+        body.mobile-view .user-email {
+            font-size: 14px;
+        }
+
+        body.mobile-view .divider {
+            margin: 14px 0;
+        }
+
+        body.mobile-view .menu-item {
+            justify-content: center;
+            padding: 14px 10px;
+            background: #f9fafb;
+            border-radius: 12px;
+            font-size: 14px;
+        }
+
+        body.mobile-view .menu-item:hover {
+            background: #f3f4f6;
+        }
+
+        body.mobile-view .menu-icon {
+            width: 18px;
+            height: 18px;
+        }
+
+        body.mobile-view .menu-icon svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        /* Drag-to-close styles */
+        body.mobile-view .popover-container {
+            transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+            touch-action: none;
+        }
+
+        body.mobile-view .popover-container.dragging {
+            transition: none;
+        }
+
+        body.mobile-view .popover-container.sliding-out {
+            transition: transform 0.25s cubic-bezier(0.32, 0.72, 0, 1);
+        }
+    </style>
+</head>
+
+<body>
+<div id="app-root">
+    <div id="popover" class="popover-container" role="dialog" aria-modal="false" aria-labelledby="profile-name">
+        <div class="popover-header">
+            <div class="avatar" id="avatar" aria-hidden="true">MC</div>
+            <div class="user-name" id="profile-name">Maya Chen</div>
+            <div class="user-email" id="profile-email">maya.chen@example.com</div>
+        </div>
+        <div class="divider"></div>
+        <button class="menu-item" id="logout-btn" aria-label="Logout">
+                <span class="menu-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                        <path d="M10.6667 11.3333L14 8M14 8L10.6667 4.66667M14 8H6M6 2H5.2C4.0799 2 3.51984 2 3.09202 2.21799C2.71569 2.40973 2.40973 2.71569 2.21799 3.09202C2 3.51984 2 4.0799 2 5.2V10.8C2 11.9201 2 12.4802 2.21799 12.908C2.40973 13.2843 2.71569 13.5903 3.09202 13.782C3.51984 14 4.07989 14 5.2 14H6" stroke="#364153" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </span>
+            <span>Log out</span>
+        </button>
+    </div>
+</div>
+<script>
+    (function() {
+        'use strict';
+        var state = {
+            userData: { name: '', email: '', initials: '', profileImage: null },
+            config: { isVisible: true },
+            isMobileView: false
+        };
+        var elements = {};
+        var clickOutsideEnabled = false;
+
+        // Drag-to-close state
+        var dragState = {
+            isDragging: false,
+            startY: 0,
+            currentY: 0,
+            threshold: 100 // pixels to drag before closing
+        };
+
+        function cacheElements() {
+            elements.appRoot = document.getElementById('app-root');
+            elements.popover = document.getElementById('popover');
+            elements.avatar = document.getElementById('avatar');
+            elements.profileName = document.getElementById('profile-name');
+            elements.profileEmail = document.getElementById('profile-email');
+            elements.logoutBtn = document.getElementById('logout-btn');
+        }
+
+        function updateUserDisplay() {
+            if (elements.profileName) elements.profileName.textContent = state.userData.name || '';
+            if (elements.profileEmail) elements.profileEmail.textContent = state.userData.email || '';
+            if (elements.avatar) {
+                if (state.userData.profileImage) {
+                    elements.avatar.innerHTML = '<img src="' + state.userData.profileImage + '" alt="' + state.userData.name + '">';
+                } else {
+                    elements.avatar.textContent = state.userData.initials || '';
+                }
+            }
+        }
+
+        function updateVisibility() {
+            if (elements.popover) {
+                if (state.config.isVisible) {
+                    elements.popover.classList.remove('hidden');
+                } else {
+                    elements.popover.classList.add('hidden');
+                }
+            }
+        }
+
+        function updateMobileView() {
+            if (state.isMobileView) {
+                document.body.classList.add('mobile-view');
+                document.body.classList.remove('desktop-view');
+            } else {
+                document.body.classList.add('desktop-view');
+                document.body.classList.remove('mobile-view');
+            }
+        }
+
+        function render() {
+            updateUserDisplay();
+            updateVisibility();
+            updateMobileView();
+        }
+
+        // Close with slide-down animation on mobile
+        function closeWithAnimation(action) {
+            if (state.isMobileView && elements.popover) {
+                elements.popover.classList.add('sliding-out');
+                elements.popover.style.transform = 'translateY(100%)';
+                state.config.isVisible = false;
+                setTimeout(function() {
+                    updateVisibility();
+                    elements.popover.style.transform = '';
+                    elements.popover.classList.remove('sliding-out');
+                    if (typeof window.myop_cta_handler === 'function') {
+                        window.myop_cta_handler(action, {});
+                    }
+                }, 250);
+            } else {
+                state.config.isVisible = false;
+                updateVisibility();
+                if (typeof window.myop_cta_handler === 'function') {
+                    window.myop_cta_handler(action, {});
+                }
+            }
+        }
+
+        function handleLogoutClick(e) {
+            e.stopPropagation();
+            e.preventDefault();
+            closeWithAnimation('logout_clicked');
+        }
+
+        function handleClickOutside(e) {
+            if (!clickOutsideEnabled || !state.config.isVisible || !elements.popover) return;
+            if (!elements.popover.contains(e.target)) {
+                closeWithAnimation('click_outside');
+            }
+        }
+
+        function handleKeydown(e) {
+            if (e.key === 'Escape') {
+                if (state.config.isVisible) {
+                    closeWithAnimation('escape_pressed');
+                }
+            }
+        }
+
+        // Drag-to-close handlers (mobile only)
+        function handleTouchStart(e) {
+            if (!state.isMobileView || !elements.popover) return;
+            dragState.isDragging = true;
+            dragState.startY = e.touches[0].clientY;
+            dragState.currentY = 0;
+            elements.popover.classList.add('dragging');
+        }
+
+        function handleTouchMove(e) {
+            if (!dragState.isDragging || !elements.popover) return;
+            var deltaY = e.touches[0].clientY - dragState.startY;
+            // Only allow dragging down (positive deltaY)
+            if (deltaY > 0) {
+                dragState.currentY = deltaY;
+                elements.popover.style.transform = 'translateY(' + deltaY + 'px)';
+            }
+        }
+
+        function handleTouchEnd() {
+            if (!dragState.isDragging || !elements.popover) return;
+            elements.popover.classList.remove('dragging');
+
+            if (dragState.currentY >= dragState.threshold) {
+                // Slide out and close the popover
+                elements.popover.classList.add('sliding-out');
+                elements.popover.style.transform = 'translateY(100%)';
+                state.config.isVisible = false;
+                setTimeout(function() {
+                    updateVisibility();
+                    elements.popover.style.transform = '';
+                    elements.popover.classList.remove('sliding-out');
+                    if (typeof window.myop_cta_handler === 'function') {
+                        window.myop_cta_handler('drag_closed', {});
+                    }
+                }, 250);
+            } else {
+                // Snap back
+                elements.popover.style.transform = '';
+            }
+
+            dragState.isDragging = false;
+            dragState.currentY = 0;
+        }
+
+        function attachEventListeners() {
+            if (elements.logoutBtn) elements.logoutBtn.addEventListener('click', handleLogoutClick);
+            document.addEventListener('click', handleClickOutside);
+            document.addEventListener('keydown', handleKeydown);
+
+            // Touch events for drag-to-close
+            if (elements.popover) {
+                elements.popover.addEventListener('touchstart', handleTouchStart, { passive: true });
+                elements.popover.addEventListener('touchmove', handleTouchMove, { passive: true });
+                elements.popover.addEventListener('touchend', handleTouchEnd);
+            }
+        }
+
+        function initializeComponent(data) {
+            if (data) {
+                if (data.userData) state.userData = Object.assign({}, state.userData, data.userData);
+                if (data.config) state.config = Object.assign({}, state.config, data.config);
+                if (data.isMobileView !== undefined) state.isMobileView = data.isMobileView;
+            }
+            render();
+
+            // Ensure elements are cached (in case init hasn't run yet)
+            if (!elements.appRoot) {
+                cacheElements();
+            }
+
+            if (state.isMobileView) {
+                // Delay on mobile to allow initial state to paint first (enables slide-up animation)
+                requestAnimationFrame(function() {
+                    requestAnimationFrame(function() {
+                        if (elements.appRoot) elements.appRoot.classList.add('initialized');
+                        // Enable click outside detection after animation completes
+                        setTimeout(function() { clickOutsideEnabled = true; }, 300);
+                    });
+                });
+            } else {
+                // Desktop: show immediately
+                if (elements.appRoot) elements.appRoot.classList.add('initialized');
+                // Enable click outside detection after a short delay to avoid immediate triggers
+                setTimeout(function() { clickOutsideEnabled = true; }, 100);
+            }
+        }
+
+        window.myop_init_interface = function(data) {
+            if (arguments.length === 0) {
+                return {
+                    userData: Object.assign({}, state.userData),
+                    config: Object.assign({}, state.config),
+                    isMobileView: state.isMobileView
+                };
+            }
+            if (data && data.action) {
+                switch (data.action) {
+                    case 'setUserData':
+                        if (data.payload) { state.userData = Object.assign({}, state.userData, data.payload); updateUserDisplay(); }
+                        break;
+                    case 'show':
+                        state.config.isVisible = true; updateVisibility();
+                        break;
+                    case 'hide':
+                        if (state.isMobileView && elements.popover) {
+                            elements.popover.classList.add('sliding-out');
+                            elements.popover.style.transform = 'translateY(100%)';
+                            setTimeout(function() {
+                                state.config.isVisible = false;
+                                updateVisibility();
+                                elements.popover.style.transform = '';
+                                elements.popover.classList.remove('sliding-out');
+                            }, 250);
+                        } else {
+                            state.config.isVisible = false;
+                            updateVisibility();
+                        }
+                        break;
+                    case 'toggle':
+                        state.config.isVisible = !state.config.isVisible; updateVisibility();
+                        break;
+                    default: console.warn('ProfilePopover: Unknown action:', data.action);
+                }
+                return;
+            }
+            initializeComponent(data);
+        };
+
+        window.myop_cta_handler = function(actionId, payload) { console.log('CTA Handler called:', actionId, payload); };
+
+        // Track if Myop has initialized the component
+        window.__myopInitCalled = false;
+        var originalInit = window.myop_init_interface;
+        window.myop_init_interface = function(data) {
+            if (arguments.length > 0) window.__myopInitCalled = true;
+            return originalInit.apply(this, arguments);
+        };
+
+        function init() {
+            cacheElements();
+            attachEventListeners();
+            render();
+            console.log('ProfilePopover component ready');
+        }
+        if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', init); } else { init(); }
+    })();
+</script>
+<script id="myop_preview">
+    // Preview script - only runs when testing locally, not in Myop
+    setTimeout(function() {
+        // Only show demo data if Myop hasn't initialized the component
+        if (!window.__myopInitCalled) {
+            document.getElementById('app-root').style.opacity = '1';
+            document.getElementById('avatar').innerHTML = 'MC';
+            document.getElementById('profile-name').innerHTML = 'Maya Chen';
+            document.getElementById('profile-email').innerHTML = 'maya.chen@example.com';
+            window.myop_init_interface({
+                userData: {
+                    name: 'Maya Chen',
+                    email: 'maya.chen@example.com',
+                    initials: 'MC',
+                    profileImage: null
+                },
+                isMobileView: false
+            });
+            window.myop_cta_handler = function(actionId, payload) {
+                console.log('Demo CTA:', actionId, payload);
+            };
+        }
+    }, 10);
+</script>
+</body>
+
+</html>

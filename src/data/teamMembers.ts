@@ -235,5 +235,3 @@ export const teamMembersData: TeamMember[] = [
         relationshipType: 'Senior contributor'
     }
 ];
-
-

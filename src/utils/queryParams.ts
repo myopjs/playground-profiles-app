@@ -9,7 +9,9 @@ export const QUERY_PARAMS = {
     profilePopover: 'profilePopover',
     tableHeader: 'tableHeader',
     editProfile: 'editProfile',
-    analytics: 'analytics'
+    analytics: 'analytics',
+    addProfile: 'addProfile',
+    treeView: 'treeView',
 } as const;
 
 type ComponentKey = keyof typeof QUERY_PARAMS;

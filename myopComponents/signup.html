@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Team Journey Sign In Component</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+            background: transparent;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+
+        .main-container {
+            width: 100%;
+            height: 100vh;
+            position: relative;
+            display: flex;
+            background: transparent;
+        }
+
+        .left-panel {
+            width: 50%;
+            background: #FFFFFF;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 48px;
+            position: relative;
+        }
+
+        .right-panel {
+            width: 50%;
+            background: #50FFEE;
+            position: relative;
+        }
+
+        .logo-container {
+            position: absolute;
+            top: 40px;
+            left: 40px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo {
+            width: 42px;
+            height: 42px;
+            background: #3A3F47;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 18px;
+            letter-spacing: -0.5px;
+        }
+
+        .logo-text {
+            color: #363740;
+            font-family: Comfortaa, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-size: 16px;
+            font-style: normal;
+            font-weight: 700;
+            line-height: 24px;
+            letter-spacing: -0.312px;
+        }
+
+        .content-wrapper {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+            width: 454px;
+        }
+
+        .title {
+            color: #363740;
+            text-align: center;
+            font-feature-settings: 'liga' off, 'clig' off;
+            font-family: Comfortaa, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-size: 28px;
+            font-style: normal;
+            font-weight: 500;
+            line-height: 116.7%;
+            margin: 0;
+        }
+
+        .subtitle {
+            color: #363740;
+            text-align: center;
+            font-feature-settings: 'liga' off, 'clig' off;
+            font-family: Comfortaa, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-size: 28px;
+            font-style: normal;
+            font-weight: 500;
+            line-height: 116.7%;
+            margin: 0;
+        }
+
+        .no-credit {
+            color: #363740;
+            text-align: center;
+            font-feature-settings: 'liga' off, 'clig' off;
+            font-family: Rubik, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-size: 16px;
+            font-style: normal;
+            font-weight: 400;
+            line-height: 150%;
+            letter-spacing: 0.15px;
+            margin-bottom: 24px;
+        }
+
+        .google-button {
+            display: flex;
+            width: 342px;
+            max-width: 100%;
+            padding: 8px 22px;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            height: 48px;
+            background: #FFFFFF;
+            border: 1.5px solid #E5E7EB;
+            border-radius: 24px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            font-size: 16px;
+            color: #3A3F47;
+            font-weight: 500;
+            text-decoration: none;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+            letter-spacing: -0.1px;
+        }
+
+        .google-button:hover {
+            background: #FAFAFA;
+            border-color: #D1D5DB;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+        }
+
+        .google-button:active {
+            transform: scale(0.99);
+        }
+
+        .google-icon {
+            width: 20px;
+            height: 20px;
+            flex-shrink: 0;
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            width: 342px;
+            max-width: 100%;
+            margin: 4px 0;
+        }
+
+        .divider-line {
+            flex: 1;
+            height: 1px;
+            background: #E5E7EB;
+        }
+
+        .divider-text {
+            padding: 0 20px;
+            color: #B8BFC8;
+            font-size: 14px;
+            font-weight: 400;
+        }
+
+        .email-button {
+            display: flex;
+            width: 342px;
+            max-width: 100%;
+            padding: 8px 22px;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            height: 48px;
+            background: #3A3F47;
+            border: none;
+            border-radius: 24px;
+            color: white;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            letter-spacing: -0.1px;
+        }
+
+        .email-button:hover {
+            background: #2B2F36;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
+        }
+
+        .email-button:active {
+            transform: scale(0.99);
+        }
+
+        .signin-link {
+            margin-top: 12px;
+            font-size: 15px;
+            color: #6B7280;
+            font-weight: 400;
+        }
+
+        .signin-link a {
+            color: #3A3F47;
+            text-decoration: underline;
+            text-underline-offset: 2px;
+            cursor: pointer;
+            transition: color 0.15s ease;
+            font-weight: 500;
+        }
+
+        .signin-link a:hover {
+            color: #1F2329;
+        }
+
+        /* Mobile responsive */
+        @media (max-width: 768px) {
+            .main-container {
+                flex-direction: column;
+                background: var(--accent-color, #50FFEE);
+                padding: 24px;
+                overflow-y: auto;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .left-panel {
+                width: 100%;
+                max-width: 420px;
+                flex: none;
+                min-height: fit-content;
+                border-radius: 16px;
+                padding: 32px 24px 40px;
+                box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+            }
+
+            .right-panel {
+                display: none;
+            }
+
+            .logo-container {
+                position: relative;
+                top: 0;
+                left: 0;
+                margin-bottom: 32px;
+            }
+
+            .content-wrapper {
+                width: 100%;
+                max-width: 342px;
+            }
+
+            .title {
+                font-size: 24px;
+            }
+
+            .subtitle {
+                font-size: 24px;
+            }
+
+            .no-credit {
+                font-size: 14px;
+                margin-bottom: 20px;
+            }
+
+            .google-button,
+            .email-button,
+            .divider {
+                width: 100%;
+            }
+
+            .google-button,
+            .email-button {
+                height: 46px;
+                font-size: 15px;
+            }
+
+            .signin-link {
+                font-size: 14px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .main-container {
+                padding: 16px;
+            }
+
+            .left-panel {
+                padding: 28px 20px 36px;
+                border-radius: 12px;
+            }
+
+            .logo-container {
+                margin-bottom: 28px;
+            }
+
+            .logo {
+                width: 38px;
+                height: 38px;
+                font-size: 16px;
+            }
+
+            .logo-text {
+                font-size: 15px;
+            }
+
+            .title {
+                font-size: 22px;
+            }
+
+            .subtitle {
+                font-size: 22px;
+            }
+
+            .google-button,
+            .email-button {
+                height: 44px;
+                font-size: 14px;
+                padding: 8px 16px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+<div id="app-root">
+    <div class="main-container" id="main-container">
+        <div class="left-panel">
+            <div class="logo-container">
+                <div class="logo" id="logo-initials">MT</div>
+                <div class="logo-text" id="logo-name">BestTeam</div>
+            </div>
+
+            <div class="content-wrapper">
+                <h1 class="title" id="title-text">Your Team Journey at a Glance</h1>
+                <p class="subtitle" id="subtitle-text">Sign in to continue</p>
+                <p class="no-credit" id="no-credit-text">No credit card required</p>
+
+                <button class="google-button" id="google-btn">
+                    <svg class="google-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <g fill="none" fill-rule="evenodd">
+                            <path d="M23.52 12.275c0-.815-.073-1.6-.21-2.352H12v4.448h6.458c-.278 1.5-1.124 2.77-2.387 3.62v3.01h3.863c2.26-2.082 3.566-5.145 3.566-8.726z" fill="#4285F4"/>
+                            <path d="M12 24c3.24 0 5.954-1.074 7.94-2.907l-3.863-3.01c-1.074.72-2.448 1.146-4.077 1.146-3.134 0-5.79-2.115-6.737-4.957H1.244v3.107A11.993 11.993 0 0012 24z" fill="#34A853"/>
+                            <path d="M5.263 14.272A7.422 7.422 0 014.875 12c0-.79.136-1.56.388-2.272V6.62H1.244A11.993 11.993 0 000 12c0 1.936.464 3.77 1.244 5.38l4.02-3.108z" fill="#FBBC04"/>
+                            <path d="M12 4.77c1.765 0 3.349.607 4.596 1.8l3.446-3.445C17.45 2.09 14.97 1 12 0 7.7 1 3.256 2.69 1.244 6.62l4.02 3.108C6.21 6.886 8.865 4.77 12 4.77z" fill="#EA4335"/>
+                        </g>
+                    </svg>
+                    <span id="google-btn-text">Sign Up With Google</span>
+                </button>
+
+                <div class="divider">
+                    <div class="divider-line"></div>
+                    <span class="divider-text">Or</span>
+                    <div class="divider-line"></div>
+                </div>
+
+                <button class="email-button" id="email-btn">
+                    <span id="email-btn-text">Sign Up With Email And Password</span>
+                </button>
+
+                <div class="signin-link" id="toggle-link">
+                    Already have an account? <a id="toggle-link-action">Sign In</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="right-panel" id="right-panel"></div>
+    </div>
+</div>
+
+<!-- Main Component Logic (IIFE) -->
+<script>
+    (function() {
+        'use strict';
+
+        // Private state
+        let state = {
+            mode: 'signup', // 'signup' or 'signin'
+            branding: {
+                logoInitials: 'MT',
+                companyName: 'BestTeam',
+                title: 'Your Team Journey at a Glance',
+                accentColor: '#50FFEE'
+            },
+            config: {
+                showGoogleAuth: true,
+                showEmailAuth: true,
+                showNoCreditCard: true
+            }
+        };
+
+        let isInitialized = false;
+
+        // DOM references
+        const elements = {};
+
+        // Google icon SVG template
+        const googleIconSVG = '<svg class="google-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><g fill="none" fill-rule="evenodd"><path d="M23.52 12.275c0-.815-.073-1.6-.21-2.352H12v4.448h6.458c-.278 1.5-1.124 2.77-2.387 3.62v3.01h3.863c2.26-2.082 3.566-5.145 3.566-8.726z" fill="#4285F4"/><path d="M12 24c3.24 0 5.954-1.074 7.94-2.907l-3.863-3.01c-1.074.72-2.448 1.146-4.077 1.146-3.134 0-5.79-2.115-6.737-4.957H1.244v3.107A11.993 11.993 0 0012 24z" fill="#34A853"/><path d="M5.263 14.272A7.422 7.422 0 014.875 12c0-.79.136-1.56.388-2.272V6.62H1.244A11.993 11.993 0 000 12c0 1.936.464 3.77 1.244 5.38l4.02-3.108z" fill="#FBBC04"/><path d="M12 4.77c1.765 0 3.349.607 4.596 1.8l3.446-3.445C17.45 2.09 14.97 1 12 0 7.7 1 3.256 2.69 1.244 6.62l4.02 3.108C6.21 6.886 8.865 4.77 12 4.77z" fill="#EA4335"/></g></svg>';
+
+        // Cache DOM elements
+        function cacheElements() {
+            elements.mainContainer = document.getElementById('main-container');
+            elements.logoInitials = document.getElementById('logo-initials');
+            elements.logoName = document.getElementById('logo-name');
+            elements.title = document.getElementById('title-text');
+            elements.subtitle = document.getElementById('subtitle-text');
+            elements.noCredit = document.getElementById('no-credit-text');
+            elements.googleBtn = document.getElementById('google-btn');
+            elements.googleBtnText = document.getElementById('google-btn-text');
+            elements.emailBtn = document.getElementById('email-btn');
+            elements.emailBtnText = document.getElementById('email-btn-text');
+            elements.toggleLink = document.getElementById('toggle-link');
+            elements.toggleLinkAction = document.getElementById('toggle-link-action');
+            elements.rightPanel = document.getElementById('right-panel');
+        }
+
+        // Update UI based on current state
+        function updateUI() {
+            // Update branding
+            if (elements.logoInitials) {
+                elements.logoInitials.textContent = state.branding.logoInitials;
+            }
+            if (elements.logoName) {
+                elements.logoName.textContent = state.branding.companyName;
+            }
+            if (elements.title) {
+                elements.title.textContent = state.branding.title;
+            }
+            if (elements.rightPanel) {
+                elements.rightPanel.style.background = state.branding.accentColor;
+            }
+            // Update accent color CSS variable for mobile background
+            if (elements.mainContainer) {
+                elements.mainContainer.style.setProperty('--accent-color', state.branding.accentColor);
+            }
+
+            // Update based on mode
+            if (state.mode === 'signin') {
+                if (elements.subtitle) {
+                    elements.subtitle.textContent = 'Welcome back';
+                }
+                if (elements.googleBtnText) {
+                    elements.googleBtnText.textContent = 'Sign In With Google';
+                }
+                if (elements.emailBtnText) {
+                    elements.emailBtnText.textContent = 'Sign In With Email And Password';
+                }
+                if (elements.toggleLink) {
+                    elements.toggleLink.innerHTML = "Don't have an account? <a id='toggle-link-action'>Sign Up</a>";
+                    elements.toggleLinkAction = document.getElementById('toggle-link-action');
+                    attachToggleLinkHandler();
+                }
+                if (elements.noCredit) {
+                    elements.noCredit.style.display = 'none';
+                }
+            } else {
+                if (elements.subtitle) {
+                    elements.subtitle.textContent = 'Sign in to continue';
+                }
+                if (elements.googleBtnText) {
+                    elements.googleBtnText.textContent = 'Sign Up With Google';
+                }
+                if (elements.emailBtnText) {
+                    elements.emailBtnText.textContent = 'Sign Up With Email And Password';
+                }
+                if (elements.toggleLink) {
+                    elements.toggleLink.innerHTML = "Already have an account? <a id='toggle-link-action'>Sign In</a>";
+                    elements.toggleLinkAction = document.getElementById('toggle-link-action');
+                    attachToggleLinkHandler();
+                }
+                if (elements.noCredit) {
+                    elements.noCredit.style.display = state.config.showNoCreditCard ? 'block' : 'none';
+                }
+            }
+
+            // Update visibility based on config
+            if (elements.googleBtn) {
+                elements.googleBtn.style.display = state.config.showGoogleAuth ? 'flex' : 'none';
+            }
+            if (elements.emailBtn) {
+                elements.emailBtn.style.display = state.config.showEmailAuth ? 'flex' : 'none';
+            }
+        }
+
+        // Attach toggle link handler
+        function attachToggleLinkHandler() {
+            if (elements.toggleLinkAction) {
+                elements.toggleLinkAction.addEventListener('click', function() {
+                    const newMode = state.mode === 'signup' ? 'signin' : 'signup';
+                    state.mode = newMode;
+                    updateUI();
+
+                    if (typeof window.myop_cta_handler === 'function') {
+                        window.myop_cta_handler('mode_changed', { mode: newMode });
+                    }
+                });
+            }
+        }
+
+        // Send CTA to parent window and myop handler
+        function sendCta(action, payload) {
+            // Call myop handler if available
+            if (typeof window.myop_cta_handler === 'function') {
+                window.myop_cta_handler(action, payload);
+            }
+            // Also send postMessage to parent for local development
+            if (window.parent !== window) {
+                window.parent.postMessage({ type: 'myop_cta', action: action, payload: payload }, '*');
+            }
+        }
+
+        // Attach event listeners
+        function attachEventListeners() {
+            // Google button click
+            if (elements.googleBtn) {
+                elements.googleBtn.addEventListener('click', function() {
+                    const action = state.mode === 'signup' ? 'google_signup' : 'google_signin';
+                    sendCta(action, { mode: state.mode });
+                });
+            }
+
+            // Email button click
+            if (elements.emailBtn) {
+                elements.emailBtn.addEventListener('click', function() {
+                    const action = state.mode === 'signup' ? 'email_signup' : 'email_signin';
+                    sendCta(action, { mode: state.mode });
+                });
+            }
+
+            // Toggle link
+            attachToggleLinkHandler();
+        }
+
+        // Initialize component with data
+        function initializeComponent(data) {
+            // Merge incoming data with defaults
+            if (data) {
+                if (data.mode) {
+                    state.mode = data.mode;
+                }
+                if (data.branding) {
+                    state.branding = { ...state.branding, ...data.branding };
+                }
+                if (data.config) {
+                    state.config = { ...state.config, ...data.config };
+                }
+            }
+
+            // Attach event listeners only once
+            if (!isInitialized) {
+                attachEventListeners();
+                isInitialized = true;
+            }
+
+            // Update the UI
+            updateUI();
+        }
+
+        // Track if Myop has initialized the component
+        window.__myopInitCalled = false;
+
+        // Public API: myop_init_interface
+        window.myop_init_interface = function(data) {
+            window.__myopInitCalled = true;
+
+            // Getter mode - return current state
+            if (arguments.length === 0) {
+                return {
+                    mode: state.mode,
+                    branding: { ...state.branding },
+                    config: { ...state.config }
+                };
+            }
+
+            // Handle action-based updates
+            if (data && data.action) {
+                switch (data.action) {
+                    case 'setMode':
+                        state.mode = data.payload;
+                        updateUI();
+                        break;
+                    case 'setBranding':
+                        state.branding = { ...state.branding, ...data.payload };
+                        updateUI();
+                        break;
+                    case 'setConfig':
+                        state.config = { ...state.config, ...data.payload };
+                        updateUI();
+                        break;
+                    default:
+                        console.warn('Unknown action:', data.action);
+                }
+                return;
+            }
+
+            // Standard initialization
+            initializeComponent(data);
+        };
+
+        // Public API: myop_cta_handler (default - can be overridden by host)
+        window.myop_cta_handler = function(actionId, payload) {
+            console.log('CTA Handler called:', actionId, payload);
+            // Default behavior - host application should override this
+        };
+
+        // Initialize DOM references when ready
+        function init() {
+            cacheElements();
+            initializeComponent(); // Initialize immediately without waiting for SDK
+            console.log('Signup component ready');
+        }
+
+        // Wait for DOM
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
+    })();
+</script>
+</body>
+
+</html>

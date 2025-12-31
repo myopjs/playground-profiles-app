@@ -3,9 +3,9 @@
   line-height: 1.5;
   font-weight: 400;
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  color-scheme: light;
+  color: #213547;
+  background-color: #ffffff;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -27,7 +27,9 @@ body {
   display: flex;
   place-items: center;
   min-width: 320px;
-  min-height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+  background-color: #ffffff;
 }
 
 h1 {
@@ -42,7 +44,7 @@ button {
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
-  background-color: #1a1a1a;
+  background-color: #f9f9f9;
   cursor: pointer;
   transition: border-color 0.25s;
 }
@@ -54,15 +56,249 @@ button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
+/* App Component */
+.app-signup-container {
+  height: 100vh;
+  width: 100vw;
+}
+
+.app-layout {
+  display: flex;
+  width: 100vw;
+  height: 100dvh;
+  overflow: hidden;
+}
+
+.app-sidebar {
+  width: clamp(200px, 22vw, 280px);
+  height: 100%;
+  position: relative;
+}
+
+.app-sidebar > *:first-child {
+  width: 100%;
+  height: 100%;
+}
+
+.app-sidebar iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+.app-main {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+  background-color: #ffffff;
+}
+
+/* HomePage Component */
+.homepage-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background-color: #ffffff;
+}
+
+.homepage-header-insights {
+  height: 244px;
+  padding-right: 24px;
+  padding-left: 24px;
+}
+
+.homepage-content-header {
+  padding-right: 24px;
+  padding-left: 24px;
+  padding-bottom: 16px;
+  height: 40px;
+}
+
+.homepage-content-area {
+  flex: 1;
+  overflow: auto;
+  padding: 0 24px 24px;
+}
+
+.homepage-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0);
+  backdrop-filter: blur(0px);
+  -webkit-backdrop-filter: blur(0px);
+  display: flex;
+  justify-content: flex-end;
+  z-index: 1000;
+  transition: background-color 300ms ease-out, backdrop-filter 300ms ease-out;
+}
+
+.homepage-modal-overlay.visible {
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+.homepage-modal-panel {
+  width: 384px;
+  height: 100%;
+  background-color: #fff;
+  transform: translateX(100%);
+  transition: transform 300ms ease-out;
+}
+
+.homepage-modal-panel.visible {
+  transform: translateX(0);
+}
+
+/* ProfilePopover Component */
+.profile-popover-container {
+  width: 300px;
+  height: 250px;
+}
+
+/* SideBar Component */
+.sidebar-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 9998;
+  opacity: 0;
+  transition: opacity 200ms ease-out;
+}
+
+.sidebar-overlay.visible {
+  opacity: 1;
+}
+
+.sidebar-popover {
+  position: absolute;
+  bottom: 50px;
+  left: 80px;
+  z-index: 9999;
+  opacity: 0;
+  transition: opacity 200ms ease-out;
+}
+
+.sidebar-popover.visible {
+  opacity: 1;
+}
+
+/* Mobile popover - rendered via portal at body level */
+.sidebar-popover.mobile {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: auto;
+  /* Override opacity - let internal component handle slide animation */
+  opacity: 1;
+  transition: none;
+}
+
+.sidebar-popover.mobile .profile-popover-container {
+  width: 100%;
+  height: 320px;
+}
+
+/* Toast Component */
+.toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  transform: translateX(calc(100% + 24px));
+  background-color: #50FFEE;
+  color: #000;
+  padding: 12px 24px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 2000;
+  font-size: 14px;
+  transition: transform 300ms ease-out;
+}
+
+.toast.visible {
+  transform: translateX(0);
+}
+
+/* Analytics Component */
+.analytics-container {
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+}
+
+/* Add Member Page */
+.add-member-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
+  padding: 24px;
+}
+
+/* Mobile Layout */
+@media (max-width: 700px) {
+  .app-layout {
+    flex-direction: row;
+    position: relative;
+  }
+
+  .app-sidebar {
+    width: 48px;
+    height: 100%;
+    flex-shrink: 0;
+    z-index: 1000;
+  }
+
+  .app-sidebar > *,
+  .app-sidebar iframe {
+    width: 48px !important;
+    height: 100% !important;
+    transition: width 0.3s ease;
+  }
+
+  .app-sidebar.expanded > *,
+  .app-sidebar.expanded iframe {
+    width: 120px !important;
+  }
+
+  .app-main {
+    flex: 1;
+    width: calc(100% - 48px);
     background-color: #ffffff;
   }
-  a:hover {
-    color: #747bff;
+
+  .homepage-header-insights {
+    height: 280px;
+    padding: 0;
   }
-  button {
-    background-color: #f9f9f9;
+
+  .homepage-content-header {
+    padding: 0 16px 12px;
+  }
+
+  .homepage-content-area {
+    padding: 0 16px 16px;
+  }
+
+  .homepage-modal-panel {
+    width: 100%;
+    transform: translateX(100%);
+    transition: transform 300ms ease-out;
+  }
+
+  .homepage-modal-panel.visible {
+    transform: translateX(0);
+  }
+
+
+  .add-member-container {
+    padding: 16px;
   }
 }
