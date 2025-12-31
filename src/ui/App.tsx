@@ -1,5 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { Signup } from "@myop/Signup";
+import { preloadComponents } from "@myop/react";
+import { COMPONENTS_IDS } from '../utils/componentsIds';
 import { Route, Routes, useNavigate, useLocation } from 'react-router-dom';
 import {Analytics} from "./Analytics.tsx";
 import {HomePage} from "./HomePage.tsx";
@@ -16,6 +18,7 @@ function App() {
     const savedUser = localStorage.getItem(LOCAL_STORAGE_KEY);
     return savedUser ? JSON.parse(savedUser) : null;
   });
+  const [donePreload, setDonePreload] = useState(false);
   const [members, setMembers] = useState<TeamMember[]>(teamMembersData);
   const [isMobileView, setIsMobileView] = useState<boolean>(window.innerWidth <= MOBILE_BREAKPOINT);
   const [isSidebarExpanded, setIsSidebarExpanded] = useState(false);
@@ -60,6 +63,11 @@ function App() {
     };
 
     useEffect(() => {
+        const componentIds = Object.values(COMPONENTS_IDS);
+        preloadComponents(componentIds, 'production').then(() => setDonePreload(true));
+    }, []);
+
+    useEffect(() => {
         const handleResize = () => {
             const newIsMobile = window.innerWidth <= MOBILE_BREAKPOINT;
             if (newIsMobile !== isMobileView) {
@@ -70,6 +78,9 @@ function App() {
         return () => window.removeEventListener('resize', handleResize);
     }, [isMobileView]);
 
+    if (!donePreload) {
+        return <div />;
+    }
 
   if (!currentUser) {
     return (<div className="app-signup-container">
