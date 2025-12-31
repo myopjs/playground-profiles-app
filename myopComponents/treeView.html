@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Team Tree View</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            height: 100%;
+        }
+
+        body {
+            width: 100%;
+            min-height: 100%;
+            background: transparent;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        }
+
+        #app-root {
+            min-height: 100%;
+            height: 100%;
+        }
+
+        .tree-container {
+            width: 100%;
+            min-height: 100%;
+            height: 100%;
+            overflow: auto;
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
+        .tree-wrapper {
+            display: inline-block;
+            min-width: 100%;
+            min-height: 100%;
+        }
+
+        /* Empty state wrapper for centering */
+        .tree-wrapper.empty {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: calc(100vh - 80px);
+        }
+
+        .tree {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            gap: 40px;
+        }
+
+        .tree-level {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            gap: 40px;
+            margin-bottom: 60px;
+            position: relative;
+        }
+
+        .tree-branch {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+        }
+
+        .tree-node {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            min-width: 280px;
+            max-width: 320px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            cursor: pointer;
+            position: relative;
+            border: 3px solid;
+        }
+
+        .tree-node:hover {
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+        }
+
+        .tree-node.level-0 {
+            border-color: #6366f1;
+            background: linear-gradient(135deg, #f8f8ff 0%, #ffffff 100%);
+        }
+
+        .tree-node.level-1 {
+            border-color: #8b5cf6;
+            background: linear-gradient(135deg, #faf5ff 0%, #ffffff 100%);
+        }
+
+        .tree-node.level-2 {
+            border-color: #ec4899;
+            background: linear-gradient(135deg, #fef5fb 0%, #ffffff 100%);
+        }
+
+        .tree-node.level-3 {
+            border-color: #f59e0b;
+            background: linear-gradient(135deg, #fffbf0 0%, #ffffff 100%);
+        }
+
+        .tree-node.level-4 {
+            border-color: #10b981;
+            background: linear-gradient(135deg, #f0fdf4 0%, #ffffff 100%);
+        }
+
+        .node-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .node-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 18px;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+
+        .node-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+
+        .node-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .node-name {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .node-role {
+            font-size: 14px;
+            color: #6b7280;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .node-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .stat {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            font-weight: 500;
+            color: #9ca3af;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-value {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .stat-value.highlight {
+            color: #6366f1;
+        }
+
+        .tree-line {
+            position: absolute;
+            background: #d1d5db;
+            z-index: -1;
+        }
+
+        .tree-line.vertical {
+            width: 2px;
+            height: 40px;
+            top: -40px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .tree-line.horizontal {
+            height: 2px;
+        }
+
+        .tree-children {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-top: 60px;
+            position: relative;
+        }
+
+        .tree-children::before {
+            content: '';
+            position: absolute;
+            top: -40px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 2px;
+            height: 40px;
+            background: #d1d5db;
+        }
+
+        .children-connector {
+            position: absolute;
+            top: -40px;
+            height: 2px;
+            background: #d1d5db;
+        }
+
+        /* Empty State - Bigger and Centered */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #9ca3af;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .empty-state-text {
+            font-size: 22px;
+            font-weight: 500;
+            margin-bottom: 12px;
+        }
+
+        .empty-state-subtext {
+            font-size: 16px;
+            margin-bottom: 24px;
+        }
+
+        /* Add Member CTA Button */
+        .empty-state-cta {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 14px;
+            border-radius: 8px;
+            border: 1px solid rgba(0, 105, 95, 0.1);
+            background: linear-gradient(0deg, rgba(80, 255, 238, 0.10) 0%, rgba(80, 255, 238, 0.10) 100%), #FFF;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: inherit;
+            text-decoration: none;
+        }
+
+        .empty-state-cta:hover {
+            background: #50FFEE;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .empty-state-cta:active {
+            transform: scale(0.98);
+        }
+
+        .empty-state-cta-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .empty-state-cta-icon svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        .empty-state-cta-text {
+            font-size: 13px;
+            font-weight: 500;
+            color: #363740;
+            letter-spacing: -0.15px;
+        }
+
+        .level-badge {
+            position: absolute;
+            top: -12px;
+            right: -12px;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: white;
+            border: 2px solid;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .level-badge.level-0 {
+            border-color: #6366f1;
+            color: #6366f1;
+        }
+
+        .level-badge.level-1 {
+            border-color: #8b5cf6;
+            color: #8b5cf6;
+        }
+
+        .level-badge.level-2 {
+            border-color: #ec4899;
+            color: #ec4899;
+        }
+
+        .level-badge.level-3 {
+            border-color: #f59e0b;
+            color: #f59e0b;
+        }
+
+        .level-badge.level-4 {
+            border-color: #10b981;
+            color: #10b981;
+        }
+
+        .reports-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 8px;
+            background: #f3f4f6;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 500;
+            color: #6b7280;
+            margin-top: 8px;
+        }
+
+        .reports-badge-icon {
+            font-size: 12px;
+        }
+
+        /* Mobile Styles - Vertical List View */
+        @media (max-width: 768px) {
+            .tree-container {
+                padding: 16px;
+                justify-content: flex-start;
+                align-items: flex-start;
+            }
+
+            .tree-wrapper {
+                width: 100%;
+                min-width: unset;
+            }
+
+            .tree-wrapper.empty {
+                height: calc(100vh - 32px);
+            }
+
+            .tree {
+                align-items: stretch;
+                width: 100%;
+            }
+
+            .tree-branch {
+                align-items: stretch;
+                width: 100%;
+            }
+
+            .tree-node {
+                min-width: unset;
+                max-width: none;
+                width: 100%;
+                padding: 14px;
+                border-width: 2px;
+                border-radius: 10px;
+                margin-bottom: 0;
+            }
+
+            .tree-node:hover {
+                transform: none;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            }
+
+            .node-header {
+                gap: 10px;
+                margin-bottom: 0;
+            }
+
+            .node-avatar {
+                width: 40px;
+                height: 40px;
+                font-size: 14px;
+            }
+
+            .node-name {
+                font-size: 15px;
+                margin-bottom: 2px;
+            }
+
+            .node-role {
+                font-size: 12px;
+            }
+
+            .node-stats {
+                display: none;
+            }
+
+            .level-badge {
+                position: absolute;
+                top: 50%;
+                right: 12px;
+                left: auto;
+                transform: translateY(-50%);
+                width: 28px;
+                height: 28px;
+                font-size: 10px;
+            }
+
+            .reports-badge {
+                display: none;
+            }
+
+            /* Hide tree connectors on mobile */
+            .tree-children::before,
+            .children-connector {
+                display: none;
+            }
+
+            .tree-children {
+                flex-direction: column;
+                gap: 0;
+                margin-top: 0;
+                padding-left: 20px;
+                border-left: 2px solid #e5e7eb;
+                margin-left: 20px;
+            }
+
+            /* Spacing between nodes */
+            .tree-branch+.tree-branch {
+                margin-top: 8px;
+            }
+
+            .tree-branch>.tree-node {
+                margin-bottom: 8px;
+            }
+
+            /* Visual connector dot for children */
+            .tree-children>.tree-branch::before {
+                content: '';
+                position: absolute;
+                left: -24px;
+                top: 26px;
+                width: 8px;
+                height: 8px;
+                background: #d1d5db;
+                border-radius: 50%;
+            }
+
+            .tree-children>.tree-branch {
+                position: relative;
+            }
+
+            /* Nested children get more indentation */
+            .tree-children .tree-children {
+                margin-left: 16px;
+                padding-left: 16px;
+            }
+
+            .tree-children .tree-children>.tree-branch::before {
+                left: -20px;
+            }
+
+            /* Empty State - Mobile */
+            .empty-state {
+                padding: 40px 20px;
+            }
+
+            .empty-state-text {
+                font-size: 18px;
+            }
+
+            .empty-state-subtext {
+                font-size: 14px;
+                margin-bottom: 20px;
+                text-wrap: balance;
+                max-width: 240px;
+            }
+
+            .empty-state-cta {
+                padding: 7px 12px;
+                gap: 5px;
+            }
+
+            .empty-state-cta-icon svg {
+                width: 14px;
+                height: 14px;
+            }
+
+            .empty-state-cta-text {
+                font-size: 12px;
+            }
+        }
+
+        /* Even smaller screens */
+        @media (max-width: 380px) {
+            .tree-container {
+                padding: 12px;
+            }
+
+            .tree-wrapper.empty {
+                height: calc(100vh - 24px);
+            }
+
+            .tree-node {
+                padding: 12px;
+            }
+
+            .node-avatar {
+                width: 36px;
+                height: 36px;
+                font-size: 13px;
+            }
+
+            .node-name {
+                font-size: 14px;
+            }
+
+            .node-role {
+                font-size: 11px;
+            }
+
+            .level-badge {
+                width: 24px;
+                height: 24px;
+                font-size: 9px;
+            }
+
+            .tree-children {
+                padding-left: 14px;
+                margin-left: 14px;
+            }
+
+            .empty-state-text {
+                font-size: 16px;
+            }
+
+            .empty-state-subtext {
+                font-size: 13px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+<div id="app-root">
+    <div class="tree-container" id="treeContainer">
+        <div class="tree-wrapper" id="treeWrapper"></div>
+    </div>
+</div>
+<script>
+    (function() {
+        // Private state
+        let state = {
+            teamMembers: [],
+            config: {},
+            isMobileView: false
+        };
+        let treeStructure = null;
+        let isInitialized = false;
+
+        // DOM references
+        const treeWrapperEl = document.getElementById('treeWrapper');
+
+        // Add member icon SVG
+        const addMemberIcon = '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M13.3333 17.5V15.8333C13.3333 14.9493 12.9821 14.1014 12.357 13.4763C11.7319 12.8512 10.884 12.5 9.99996 12.5H4.99996C4.1159 12.5 3.26806 12.8512 2.64294 13.4763C2.01782 14.1014 1.66663 14.9493 1.66663 15.8333V17.5" stroke="#363740" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round"/><path d="M7.49996 9.16667C9.34091 9.16667 10.8333 7.67428 10.8333 5.83333C10.8333 3.99238 9.34091 2.5 7.49996 2.5C5.65901 2.5 4.16663 3.99238 4.16663 5.83333C4.16663 7.67428 5.65901 9.16667 7.49996 9.16667Z" stroke="#363740" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round"/><path d="M15.8334 6.66797V11.668" stroke="#363740" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round"/><path d="M18.3334 9.16797H13.3334" stroke="#363740" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+        function getInitials(name) {
+            if (!name) return '??';
+            const parts = name.trim().split(' ');
+            if (parts.length === 1) return parts[0].substring(0, 2).toUpperCase();
+            return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+        }
+
+        function deriveManagerId(member, allMembers) {
+            if (member.managerId !== null && member.managerId !== undefined) {
+                return member.managerId;
+            }
+            if (member.relationship) {
+                const match = member.relationship.match(/reports to\s+(.+)/i);
+                if (match) {
+                    const managerName = match[1].trim();
+                    const manager = allMembers.find(m => m.name.toLowerCase() === managerName.toLowerCase());
+                    if (manager) return manager.id;
+                }
+            }
+            if (member.role === 'Manager' || (member.role && member.role.toLowerCase().includes('lead'))) {
+                return null;
+            }
+            return null;
+        }
+
+        function buildTreeStructure() {
+            if (!state.teamMembers || state.teamMembers.length === 0) {
+                treeStructure = null;
+                return;
+            }
+
+            state.teamMembers.forEach(member => {
+                member.managerId = deriveManagerId(member, state.teamMembers);
+            });
+
+            const dataMap = new Map();
+            state.teamMembers.forEach(member => {
+                if (!member.initials) member.initials = getInitials(member.name);
+                dataMap.set(member.id, { ...member, children: [], level: 0 });
+            });
+
+            const roots = [];
+            dataMap.forEach(member => {
+                if (member.managerId === null || member.managerId === undefined) {
+                    roots.push(member);
+                    member.level = 0;
+                } else {
+                    const manager = dataMap.get(member.managerId);
+                    if (manager) {
+                        manager.children.push(member);
+                    } else {
+                        roots.push(member);
+                    }
+                }
+            });
+
+            function setLevels(node, level) {
+                node.level = level;
+                if (node.children) node.children.forEach(child => setLevels(child, level + 1));
+            }
+            roots.forEach(root => setLevels(root, 0));
+            treeStructure = roots.length === 1 ? roots[0] : { children: roots, isMultiRoot: true };
+        }
+
+        function createNodeHTML(member) {
+            const directReports = member.children ? member.children.length : 0;
+            const levelClass = 'level-' + Math.min(member.level || 0, 4);
+            const initials = member.initials || getInitials(member.name);
+            const title = member.title || member.role || 'Team Member';
+            const avatarContent = member.profileImage
+                ? '<img src="' + member.profileImage + '" alt="' + member.name + '">'
+                : initials;
+            return '<div class="tree-node ' + levelClass + '" data-member-id="' + member.id + '">' +
+                '<div class="level-badge ' + levelClass + '">L' + (member.level || 0) + '</div>' +
+                '<div class="node-header">' +
+                '<div class="node-avatar">' + avatarContent + '</div>' +
+                '<div class="node-info">' +
+                '<div class="node-name" title="' + member.name + '">' + member.name + '</div>' +
+                '<div class="node-role" title="' + title + '">' + title + '</div>' +
+                '</div>' +
+                '</div>' +
+                '<div class="node-stats">' +
+                '<div class="stat"><div class="stat-label">Tenure</div><div class="stat-value">' + (member.tenure || 'N/A') + '</div></div>' +
+                '<div class="stat"><div class="stat-label">Experience</div><div class="stat-value highlight">' + (member.experience || 'N/A') + '</div></div>' +
+                '</div>' +
+                (directReports > 0 ? '<div class="reports-badge"><span class="reports-badge-icon">👥</span><span>' + directReports + ' direct report' + (directReports !== 1 ? 's' : '') + '</span></div>' : '') +
+                '</div>';
+        }
+
+        function renderTreeBranch(member) {
+            if (!member) return '';
+            const hasChildren = member.children && member.children.length > 0;
+            let html = '<div class="tree-branch">' + createNodeHTML(member);
+            if (hasChildren) {
+                html += '<div class="tree-children">';
+                if (member.children.length > 1) html += '<div class="children-connector"></div>';
+                member.children.forEach(child => { html += renderTreeBranch(child); });
+                html += '</div>';
+            }
+            html += '</div>';
+            return html;
+        }
+
+        function handleAddMemberClick() {
+            window.myop_cta_handler('addMember', {});
+        }
+
+        function positionConnectors() {
+            if (window.innerWidth <= 768) return;
+
+            document.querySelectorAll('.tree-children').forEach(childrenContainer => {
+                const connector = childrenContainer.querySelector('.children-connector');
+                const branches = childrenContainer.querySelectorAll(':scope > .tree-branch');
+                if (!connector || branches.length < 2) return;
+                const firstRect = branches[0].getBoundingClientRect();
+                const lastRect = branches[branches.length - 1].getBoundingClientRect();
+                const containerRect = childrenContainer.getBoundingClientRect();
+                const left = firstRect.left + firstRect.width / 2 - containerRect.left;
+                const right = lastRect.left + lastRect.width / 2 - containerRect.left;
+                connector.style.left = left + 'px';
+                connector.style.width = (right - left) + 'px';
+            });
+        }
+
+        function attachClickHandlers() {
+            document.querySelectorAll('.tree-node').forEach(node => {
+                node.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const memberId = this.dataset.memberId;
+                    const member = state.teamMembers.find(m => String(m.id) === String(memberId));
+                    if (member) {
+                        window.myop_cta_handler('member_clicked', { member: member });
+                    }
+                });
+            });
+        }
+
+        function render() {
+            // Update mobile view
+            if (state.isMobileView) {
+                document.body.classList.add('mobile-view');
+            } else {
+                document.body.classList.remove('mobile-view');
+            }
+
+            // Empty state
+            if (!state.teamMembers || state.teamMembers.length === 0) {
+                treeWrapperEl.classList.add('empty');
+                treeWrapperEl.innerHTML =
+                    '<div class="empty-state">' +
+                    '<div class="empty-state-text">No Team Data</div>' +
+                    '<div class="empty-state-subtext">Team hierarchy will appear here once data is loaded</div>' +
+                    '<button class="empty-state-cta" id="addMemberBtn">' +
+                    '<div class="empty-state-cta-icon">' + addMemberIcon + '</div>' +
+                    '<span class="empty-state-cta-text">Add New Member</span>' +
+                    '</button>' +
+                    '</div>';
+                const addBtn = document.getElementById('addMemberBtn');
+                if (addBtn) {
+                    addBtn.addEventListener('click', handleAddMemberClick);
+                }
+                return;
+            }
+
+            // Invalid structure
+            if (!treeStructure) {
+                treeWrapperEl.classList.add('empty');
+                treeWrapperEl.innerHTML = '<div class="empty-state"><div class="empty-state-text">Invalid Team Structure</div><div class="empty-state-subtext">No root member found (member with no manager)</div></div>';
+                return;
+            }
+
+            // Render tree
+            treeWrapperEl.classList.remove('empty');
+            if (treeStructure.isMultiRoot) {
+                let html = '<div class="tree">';
+                treeStructure.children.forEach(root => { html += renderTreeBranch(root); });
+                html += '</div>';
+                treeWrapperEl.innerHTML = html;
+            } else {
+                treeWrapperEl.innerHTML = '<div class="tree">' + renderTreeBranch(treeStructure) + '</div>';
+            }
+            positionConnectors();
+            attachClickHandlers();
+        }
+
+        function setupEventListeners() {
+            window.addEventListener('resize', () => setTimeout(positionConnectors, 100));
+        }
+
+        function initializeComponent(data) {
+            state = {
+                teamMembers: data.teamMembers || (Array.isArray(data) ? data : []),
+                config: data.config || {},
+                isMobileView: data.isMobileView || false
+            };
+
+            if (!isInitialized) {
+                setupEventListeners();
+                isInitialized = true;
+            }
+
+            buildTreeStructure();
+            render();
+        }
+
+        // Public API
+        window.myop_init_interface = function(data) {
+            if (!data) {
+                return { ...state };
+            }
+
+            if (data.action) {
+                switch (data.action) {
+                    case 'setData':
+                        state.teamMembers = data.payload || [];
+                        buildTreeStructure();
+                        render();
+                        break;
+                    case 'updateMember':
+                        if (data.payload && data.payload.id) {
+                            const idx = state.teamMembers.findIndex(m => m.id === data.payload.id);
+                            if (idx !== -1) {
+                                state.teamMembers[idx] = { ...state.teamMembers[idx], ...data.payload };
+                                buildTreeStructure();
+                                render();
+                            }
+                        }
+                        break;
+                    case 'addMember':
+                        if (data.payload) {
+                            state.teamMembers.push(data.payload);
+                            buildTreeStructure();
+                            render();
+                        }
+                        break;
+                    case 'removeMember':
+                        if (data.payload && data.payload.id) {
+                            state.teamMembers = state.teamMembers.filter(m => m.id !== data.payload.id);
+                            buildTreeStructure();
+                            render();
+                        }
+                        break;
+                    default:
+                        console.warn('TreeView: Unknown action:', data.action);
+                }
+                return;
+            }
+
+            initializeComponent(data);
+        };
+
+        window.myop_cta_handler = function(actionId, payload) {
+            console.log('CTA Handler:', actionId, payload);
+        };
+    })();
+</script>
+
+<!-- Mock Data for Preview -->
+<script id="myop_preview">
+    window.myop_init_interface({
+        teamMembers: [
+            { id: 1, name: "Sarah Johnson", title: "VP of Engineering", initials: "SJ", role: "Manager", managerId: null, tenure: "5.2 years", experience: "15 years" },
+            { id: 2, name: "Maya Chen", title: "Senior Product Designer", initials: "MC", role: "Manager", managerId: 1, tenure: "3.1 years", experience: "8 years" },
+            { id: 3, name: "Jordan Park", title: "Engineering Manager", initials: "JP", role: "Manager", managerId: 1, tenure: "4.5 years", experience: "10 years" },
+            { id: 4, name: "Jamie Torres", title: "Product Designer", initials: "JT", role: "Senior Member", managerId: 2, tenure: "1.8 years", experience: "4 years" }
+        ],
+        config: {},
+        isMobileView: false
+    });
+</script>
+</body>
+
+</html>

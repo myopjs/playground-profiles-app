@@ -1,17 +1,19 @@
-import {MyopComponent} from "@myop/react";
-import {getComponentId, QUERY_PARAMS} from "../utils/queryParams.ts";
+import { Sidebar } from "@myop/Sidebar";
 import {type UserData} from "../data/mockUsers.ts";
 import {ProfilePopover} from "./ProfilePopover.tsx";
 import {useState, useEffect} from "react";
+import {createPortal} from "react-dom";
 
 type SideBarProps = {
     userData: UserData;
     activeNavItem: string;
     onLogout: () => void;
     onNavigate: (navId: string) => void;
+    isMobileView: boolean;
+    onSidebarToggle?: (expanded: boolean) => void;
 }
 
-export const SideBar = ({ userData, activeNavItem, onLogout, onNavigate }: SideBarProps) => {
+export const SideBar = ({ userData, activeNavItem, onLogout, onNavigate, isMobileView, onSidebarToggle }: SideBarProps) => {
     const [isOpen, setIsOpen] = useState(false);
     const [isVisible, setIsVisible] = useState(false);
 
@@ -33,52 +35,44 @@ export const SideBar = ({ userData, activeNavItem, onLogout, onNavigate }: SideB
         profileImage: userData.profileImage
     };
 
-    const handleCta = (actionId: string, payload: any) => {
-        console.log('SideBar CTA:', actionId, payload);
-        if (actionId === 'profile_clicked') {
+    const handleCta = (action: string, payload: any): void => {
+        console.log('SideBar CTA:', action, payload);
+        if (action === 'profile_clicked') {
             setIsOpen(true);
         }
-        if (actionId === 'nav_clicked' && payload?.navId) {
+        if (action === 'nav_clicked' && payload?.navId) {
             onNavigate(payload.navId);
+        }
+        if (action === 'sidebar_toggled' && onSidebarToggle) {
+            onSidebarToggle(payload?.expanded ?? false);
         }
     };
 
-    return <>
-        <MyopComponent
-            componentId={getComponentId(QUERY_PARAMS.sidebar)}
-            data={{ userData: sidebarUserData, activeNavItem }}
-            on={handleCta as any}
-        />
-        {isOpen && (
-            <>
-                <div
-                    style={{
-                        position: 'fixed',
-                        top: 0,
-                        left: 0,
-                        right: 0,
-                        bottom: 0,
-                        zIndex: 9998,
-                        opacity: isVisible ? 1 : 0,
-                        transition: 'opacity 200ms ease-out'
-                    }}
-                    onClick={closePopover}
+    const popoverContent = isOpen && (
+        <>
+            <div
+                className={`sidebar-overlay${isVisible ? ' visible' : ''}`}
+                onClick={closePopover}
+            />
+            <div className={`sidebar-popover${isVisible ? ' visible' : ''}${isMobileView ? ' mobile' : ''}`}>
+                <ProfilePopover
+                    userData={userData}
+                    onClose={closePopover}
+                    onLogout={onLogout}
+                    isMobileView={isMobileView}
                 />
-                <div style={{
-                    position: 'fixed',
-                    bottom: '10px',
-                    left: '100px',
-                    zIndex: 9999,
-                    opacity: isVisible ? 1 : 0,
-                    transition: 'opacity 200ms ease-out'
-                }}>
-                    <ProfilePopover
-                        userData={userData}
-                        onClose={closePopover}
-                        onLogout={onLogout}
-                    />
-                </div>
-            </>
-        )}
+            </div>
+        </>
+    );
+
+    return <>
+        <Sidebar
+            data={{ userData: sidebarUserData, activeNavItem, isMobileView }}
+            on={handleCta}
+        />
+        {isMobileView
+            ? popoverContent && createPortal(popoverContent, document.body)
+            : popoverContent
+        }
     </>
 }

@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Table Component</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        html {
+            height: 100%;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: transparent;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+        }
+
+        #app-root {
+            height: 100%;
+        }
+
+        .main-container {
+            width: 100%;
+            max-width: 100%;
+            height: 100%;
+            padding: 0;
+            background: transparent;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .team-table {
+            flex: 1;
+            min-height: 0;
+            border-radius: 10px;
+            border: 1px solid rgba(0, 0, 0, 0.10);
+            background: #FFF;
+            overflow: auto;
+            position: relative;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .team-table::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        .team-table::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .team-table::-webkit-scrollbar-thumb {
+            background: transparent;
+            border-radius: 3px;
+            transition: background 0.3s ease;
+        }
+
+        .team-table:hover::-webkit-scrollbar-thumb {
+            background: #E5E7EB;
+        }
+
+        .team-table::-webkit-scrollbar-thumb:hover {
+            background: #D1D5DB;
+        }
+
+        .team-table {
+            scrollbar-width: thin;
+            scrollbar-color: transparent transparent;
+        }
+
+        .team-table:hover {
+            scrollbar-color: #E5E7EB transparent;
+        }
+
+        table {
+            width: 100%;
+            min-width: max-content;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+
+        thead {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        thead tr {
+            background: #F9FAFB;
+        }
+
+        th {
+            padding: 16px 24px;
+            text-align: left;
+            font-size: 13px;
+            font-weight: 500;
+            color: #666;
+            text-transform: capitalize;
+            background: #F9FAFB;
+            border-bottom: 1px solid #e8e8e8;
+            position: sticky;
+            top: 0;
+            white-space: nowrap;
+        }
+
+        /* Fixed column widths to prevent jumping on data changes */
+        th:nth-child(1), td:nth-child(1) { width: 200px; min-width: 200px; } /* Member */
+        th:nth-child(2), td:nth-child(2) { width: 180px; min-width: 180px; } /* Title */
+        th:nth-child(3), td:nth-child(3) { width: 160px; min-width: 160px; } /* Location */
+        th:nth-child(4), td:nth-child(4) { width: 100px; min-width: 100px; } /* Tenure */
+        th:nth-child(5), td:nth-child(5) { width: 120px; min-width: 120px; } /* Experience */
+        th:nth-child(6), td:nth-child(6) { width: 280px; min-width: 280px; } /* Skills */
+
+        th.sortable {
+            cursor: pointer;
+            user-select: none;
+            transition: background 0.15s ease;
+        }
+
+        th.sortable:hover {
+            background: #f0f0f0;
+        }
+
+        th.sortable .th-content {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        th.sortable .sort-icon {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            opacity: 0.3;
+        }
+
+        th.sortable.active .sort-icon {
+            opacity: 1;
+            color: #3B82F6;
+        }
+
+        th.sortable .sort-icon svg {
+            width: 10px;
+            height: 10px;
+        }
+
+        tbody tr {
+            border-bottom: 1px solid #f0f0f0;
+            transition: all 0.15s ease;
+            background: #FFF;
+        }
+
+        tbody tr:last-child {
+            border-bottom: none;
+        }
+
+        tbody tr:last-child td:first-child {
+            border-bottom-left-radius: 10px;
+        }
+
+        tbody tr:last-child td:last-child {
+            border-bottom-right-radius: 10px;
+        }
+
+        tbody tr:hover {
+            background: rgba(80, 255, 238, 0.20);
+        }
+
+        tbody tr:hover td {
+            background: inherit;
+        }
+
+        td {
+            padding: 20px 24px;
+            font-size: 12px;
+            color: #1a1a1a;
+        }
+
+        .member-cell {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .member-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 600;
+            color: #FFFFFF;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+
+        .member-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .member-name {
+            color: #363740;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-size: 14px;
+            font-weight: 400;
+            line-height: 24px;
+            white-space: nowrap;
+        }
+
+        .location-text,
+        .title-text {
+            color: #717182;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-size: 14px;
+            font-weight: 400;
+            line-height: 24px;
+            white-space: nowrap;
+        }
+
+        .tenure-text,
+        .experience-text {
+            color: #363740;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-size: 14px;
+            font-weight: 400;
+            line-height: 24px;
+        }
+
+        .skills-cell {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            width: 320px;
+            height: 50px;
+        }
+
+        .skill-tag {
+            display: flex;
+            height: 22px;
+            padding: 2px 8px;
+            justify-content: center;
+            align-items: center;
+            gap: 4px;
+            flex-shrink: 0;
+            border-radius: 10px;
+            border: 1px solid #bfdbfe;
+            background: #eff6ff;
+            color: #363740;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-size: 12px;
+            font-weight: 400;
+            line-height: 16px;
+            white-space: nowrap;
+        }
+
+        .skill-more {
+            display: flex;
+            width: 31.133px;
+            height: 22px;
+            justify-content: center;
+            align-items: center;
+            flex-shrink: 0;
+            border-radius: 10px;
+            border: 1px solid #bfdbfe;
+            background: #eff6ff;
+            color: #0F0F0F;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-size: 11px;
+            font-weight: 400;
+            line-height: 16px;
+        }
+
+        /* Empty state styles */
+        .empty-state-container {
+            display: none;
+            flex: 1;
+            min-height: 0;
+            border-radius: 10px;
+            border: 1px solid rgba(0, 0, 0, 0.10);
+            background: #FFF;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+        }
+
+        .empty-state-container.visible {
+            display: flex;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #9ca3af;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+        }
+
+        .empty-state-text {
+            font-size: 22px;
+            font-weight: 500;
+            margin-bottom: 12px;
+        }
+
+        .empty-state-subtext {
+            font-size: 16px;
+            margin-bottom: 24px;
+        }
+
+        /* Add Member CTA Button */
+        .empty-state-cta {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 14px;
+            border-radius: 8px;
+            border: 1px solid rgba(0, 105, 95, 0.1);
+            background: linear-gradient(0deg, rgba(80, 255, 238, 0.10) 0%, rgba(80, 255, 238, 0.10) 100%), #FFF;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: inherit;
+            text-decoration: none;
+        }
+
+        .empty-state-cta:hover {
+            background: #50FFEE;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .empty-state-cta:active {
+            transform: scale(0.98);
+        }
+
+        .empty-state-cta-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .empty-state-cta-icon svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        .empty-state-cta-text {
+            font-size: 13px;
+            font-weight: 500;
+            color: #363740;
+            letter-spacing: -0.15px;
+        }
+
+        /* Hide table when empty */
+        .team-table.hidden {
+            display: none;
+        }
+
+        @media (max-width: 1200px) {
+            .main-container {
+                width: 100%;
+                padding: 0;
+            }
+
+            table {
+                min-width: 800px;
+            }
+
+            .skills-cell {
+                width: 280px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-container {
+                width: 100%;
+                padding: 0;
+            }
+
+            table {
+                min-width: 700px;
+            }
+
+            th {
+                padding: 12px 16px;
+                font-size: 12px;
+            }
+
+            td {
+                padding: 16px;
+            }
+
+            .member-avatar {
+                width: 36px;
+                height: 36px;
+                font-size: 10px;
+            }
+
+            .skills-cell {
+                width: 240px;
+                height: auto;
+            }
+
+            .skill-tag {
+                height: 20px;
+                padding: 2px 6px;
+            }
+
+            .skill-more {
+                height: 20px;
+                width: 28px;
+            }
+        }
+
+        @media (max-width: 600px) {
+
+            /* Empty State - Mobile */
+            .empty-state {
+                padding: 40px 20px;
+                width: 100%;
+            }
+
+            .empty-state-text {
+                font-size: 18px;
+            }
+
+            .empty-state-subtext {
+                font-size: 14px;
+                margin-bottom: 20px;
+                text-wrap: balance;
+                max-width: 240px;
+            }
+
+            .empty-state-cta {
+                padding: 7px 12px;
+                gap: 5px;
+            }
+
+            .empty-state-cta-icon svg {
+                width: 14px;
+                height: 14px;
+            }
+
+            .empty-state-cta-text {
+                font-size: 12px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .main-container {
+                padding: 0;
+                width: 100%;
+            }
+
+            table {
+                min-width: 600px;
+            }
+
+            th {
+                padding: 10px 12px;
+                font-size: 11px;
+            }
+
+            td {
+                padding: 12px;
+            }
+
+            .member-avatar {
+                width: 32px;
+                height: 32px;
+                font-size: 9px;
+            }
+
+            .skills-cell {
+                width: 200px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+<div id="app-root">
+    <div class="main-container">
+        <!-- Empty state container -->
+        <div id="emptyStateContainer" class="empty-state-container"></div>
+
+        <!-- Table - hidden when empty -->
+        <div class="team-table" id="teamTableContainer">
+            <table>
+                <thead>
+                <tr id="tableHeader"></tr>
+                </thead>
+                <tbody id="teamTableBody"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function() {
+        // Private state
+        let state = {
+            teamData: [],
+            currentSort: { column: null, direction: 'asc' },
+            isMobileView: false
+        };
+
+        // DOM references
+        const emptyStateContainerEl = document.getElementById('emptyStateContainer');
+        const teamTableContainerEl = document.getElementById('teamTableContainer');
+        const tableHeaderEl = document.getElementById('tableHeader');
+        const tableBodyEl = document.getElementById('teamTableBody');
+
+        // Column configuration
+        const columns = [
+            { key: 'name', label: 'Member', sortable: true, sortType: 'alpha' },
+            { key: 'title', label: 'Title', sortable: true, sortType: 'alpha' },
+            { key: 'location', label: 'Location', sortable: false },
+            { key: 'tenure', label: 'Tenure', sortable: true, sortType: 'numeric' },
+            { key: 'experience', label: 'Experience', sortable: true, sortType: 'numeric' },
+            { key: 'skills', label: 'Skills', sortable: false }
+        ];
+
+        // Add member icon SVG
+        const addMemberIcon = '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M13.3333 17.5V15.8333C13.3333 14.9493 12.9821 14.1014 12.357 13.4763C11.7319 12.8512 10.884 12.5 9.99996 12.5H4.99996C4.1159 12.5 3.26806 12.8512 2.64294 13.4763C2.01782 14.1014 1.66663 14.9493 1.66663 15.8333V17.5" stroke="#363740" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round"/><path d="M7.49996 9.16667C9.34091 9.16667 10.8333 7.67428 10.8333 5.83333C10.8333 3.99238 9.34091 2.5 7.49996 2.5C5.65901 2.5 4.16663 3.99238 4.16663 5.83333C4.16663 7.67428 5.65901 9.16667 7.49996 9.16667Z" stroke="#363740" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round"/><path d="M15.8334 6.66797V11.668" stroke="#363740" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round"/><path d="M18.3334 9.16797H13.3334" stroke="#363740" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+        function parseNumericValue(value) {
+            return parseFloat(String(value).replace(/[^0-9.]/g, '')) || 0;
+        }
+
+        function sortData(column, direction) {
+            const colDef = columns.find(c => c.key === column);
+            if (!colDef || !colDef.sortable) return;
+
+            state.teamData.sort((a, b) => {
+                let valA, valB;
+                if (colDef.sortType === 'alpha') {
+                    valA = (a[column] || '').toLowerCase();
+                    valB = (b[column] || '').toLowerCase();
+                    return direction === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA);
+                } else if (colDef.sortType === 'numeric') {
+                    valA = parseNumericValue(a[column]);
+                    valB = parseNumericValue(b[column]);
+                    return direction === 'asc' ? valA - valB : valB - valA;
+                }
+                return 0;
+            });
+        }
+
+        function handleHeaderClick(column) {
+            const colDef = columns.find(c => c.key === column);
+            if (!colDef || !colDef.sortable) return;
+
+            if (state.currentSort.column === column) {
+                state.currentSort.direction = state.currentSort.direction === 'asc' ? 'desc' : 'asc';
+            } else {
+                state.currentSort.column = column;
+                state.currentSort.direction = colDef.sortType === 'numeric' ? 'desc' : 'asc';
+            }
+
+            sortData(column, state.currentSort.direction);
+            render();
+
+            window.myop_cta_handler('sort', {
+                column: column,
+                direction: state.currentSort.direction,
+                sortedIds: state.teamData.map(m => m.id)
+            });
+        }
+
+        function handleAddMemberClick() {
+            window.myop_cta_handler('addMember', {});
+        }
+
+        function getSortIcon(column) {
+            const isActive = state.currentSort.column === column;
+            const direction = state.currentSort.direction;
+            return `<span class="sort-icon">
+                    <svg viewBox="0 0 10 6" fill="${isActive && direction === 'asc' ? 'currentColor' : '#ccc'}"><path d="M5 0L10 6H0L5 0Z"/></svg>
+                    <svg viewBox="0 0 10 6" fill="${isActive && direction === 'desc' ? 'currentColor' : '#ccc'}"><path d="M5 6L0 0H10L5 6Z"/></svg>
+                </span>`;
+        }
+
+        function render() {
+            // Update mobile view
+            if (state.isMobileView) {
+                document.body.classList.add('mobile-view');
+            } else {
+                document.body.classList.remove('mobile-view');
+            }
+
+            // Empty state
+            const isEmpty = state.teamData.length === 0;
+            if (isEmpty) {
+                emptyStateContainerEl.innerHTML =
+                    '<div class="empty-state">' +
+                    '<div class="empty-state-text">No Team Data</div>' +
+                    '<div class="empty-state-subtext">Team members will appear here once data is loaded</div>' +
+                    '<button class="empty-state-cta" id="addMemberBtn">' +
+                    '<div class="empty-state-cta-icon">' + addMemberIcon + '</div>' +
+                    '<span class="empty-state-cta-text">Add New Member</span>' +
+                    '</button>' +
+                    '</div>';
+                const addBtn = document.getElementById('addMemberBtn');
+                if (addBtn) {
+                    addBtn.addEventListener('click', handleAddMemberClick);
+                }
+                emptyStateContainerEl.classList.add('visible');
+                teamTableContainerEl.classList.add('hidden');
+                return;
+            }
+
+            emptyStateContainerEl.classList.remove('visible');
+            teamTableContainerEl.classList.remove('hidden');
+
+            // Render header (only if not already rendered)
+            if (tableHeaderEl.children.length === 0) {
+                columns.forEach(col => {
+                    const th = document.createElement('th');
+                    if (col.sortable) {
+                        th.className = 'sortable';
+                        th.innerHTML = `<div class="th-content"><span>${col.label}</span>${getSortIcon(col.key)}</div>`;
+                        th.addEventListener('click', () => handleHeaderClick(col.key));
+                    } else {
+                        th.textContent = col.label;
+                    }
+                    tableHeaderEl.appendChild(th);
+                });
+            } else {
+                // Just update sort indicators
+                tableHeaderEl.querySelectorAll('th.sortable').forEach((th, index) => {
+                    const col = columns.filter(c => c.sortable)[index];
+                    if (col) {
+                        th.className = 'sortable' + (state.currentSort.column === col.key ? ' active' : '');
+                        const iconSpan = th.querySelector('.sort-icon');
+                        if (iconSpan) {
+                            iconSpan.outerHTML = getSortIcon(col.key);
+                        }
+                    }
+                });
+            }
+
+            // Render body using DocumentFragment to prevent flicker
+            const fragment = document.createDocumentFragment();
+            state.teamData.forEach((member, index) => {
+                fragment.appendChild(createRowElement(member, index));
+            });
+            tableBodyEl.replaceChildren(fragment);
+        }
+
+        function createRowElement(member, index) {
+            const tr = document.createElement('tr');
+            tr.setAttribute('data-member-id', member.id);
+            tr.style.cursor = 'pointer';
+            tr.onclick = () => {
+                window.myop_cta_handler('member_clicked', { member: member, index: index });
+            };
+
+            const visibleSkills = (member.skills || []).slice(0, 3);
+            const remainingSkills = (member.skills || []).length - 3;
+
+            const avatarContent = member.profileImage
+                ? `<img src="${member.profileImage}" alt="${member.name}">`
+                : (member.initials || member.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2));
+
+            tr.innerHTML = `
+                <td><div class="member-cell"><div class="member-avatar" style="background: ${member.avatarColor || '#363740'};">${avatarContent}</div><span class="member-name">${member.name}</span></div></td>
+                <td class="title-text">${member.title || '--'}</td>
+                <td class="location-text">${member.location || '--'}</td>
+                <td class="tenure-text">${member.tenure || '--'}</td>
+                <td class="experience-text">${member.experience || '--'}</td>
+                <td><div class="skills-cell">${visibleSkills.map(skill => `<span class="skill-tag">${skill}</span>`).join('')}${remainingSkills > 0 ? `<span class="skill-more">+${remainingSkills}</span>` : ''}</div></td>
+            `;
+            return tr;
+        }
+
+        function removeRowById(memberId) {
+            const row = tableBodyEl.querySelector(`tr[data-member-id="${memberId}"]`);
+            if (row) {
+                row.remove();
+            }
+        }
+
+        function updateRowById(memberId) {
+            const index = state.teamData.findIndex(m => m.id === memberId);
+            if (index === -1) return;
+
+            const oldRow = tableBodyEl.querySelector(`tr[data-member-id="${memberId}"]`);
+            if (oldRow) {
+                const newRow = createRowElement(state.teamData[index], index);
+                oldRow.replaceWith(newRow);
+            }
+        }
+
+        let isInitialized = false;
+
+        function initializeComponent(data) {
+            const newTeamData = data.teamData || (Array.isArray(data) ? data : []);
+
+            // Skip render if already initialized with same data
+            if (isInitialized && JSON.stringify(state.teamData) === JSON.stringify(newTeamData)) {
+                return;
+            }
+
+            state = {
+                teamData: newTeamData,
+                currentSort: { column: null, direction: 'asc' },
+                isMobileView: data.isMobileView || false
+            };
+
+            if (!isInitialized) {
+                isInitialized = true;
+            }
+
+            render();
+        }
+
+        // Public API
+        window.myop_init_interface = function(data) {
+            if (!data) {
+                return { ...state };
+            }
+
+            if (data.action) {
+                switch (data.action) {
+                    case 'setData':
+                    case 'setTeamData':
+                        state.teamData = data.payload || [];
+                        state.currentSort = { column: null, direction: 'asc' };
+                        render();
+                        break;
+                    case 'updateMember':
+                        if (data.payload && data.payload.id) {
+                            const index = state.teamData.findIndex(m => m.id === data.payload.id);
+                            if (index !== -1) {
+                                state.teamData[index] = { ...state.teamData[index], ...data.payload };
+                                updateRowById(data.payload.id);
+                            }
+                        }
+                        break;
+                    case 'addMember':
+                        if (data.payload) {
+                            state.teamData.push(data.payload);
+                            // Show table if it was hidden (empty state)
+                            if (state.teamData.length === 1) {
+                                render();
+                            } else {
+                                tableBodyEl.appendChild(createRowElement(data.payload, state.teamData.length - 1));
+                            }
+                        }
+                        break;
+                    case 'removeMember':
+                        if (data.payload && data.payload.id) {
+                            removeRowById(data.payload.id);
+                            state.teamData = state.teamData.filter(m => m.id !== data.payload.id);
+                            // Show empty state if no members left
+                            if (state.teamData.length === 0) {
+                                render();
+                            }
+                        }
+                        break;
+                    case 'sort':
+                        if (data.payload && data.payload.column) {
+                            const colDef = columns.find(c => c.key === data.payload.column);
+                            if (colDef && colDef.sortable) {
+                                state.currentSort.column = data.payload.column;
+                                state.currentSort.direction = data.payload.direction || 'asc';
+                                sortData(state.currentSort.column, state.currentSort.direction);
+                                render();
+                            }
+                        }
+                        break;
+                    default:
+                        console.warn('Table: Unknown action:', data.action);
+                }
+                return;
+            }
+
+            initializeComponent(data);
+        };
+
+        window.myop_cta_handler = function(actionId, payload) {
+            console.log('CTA Handler:', actionId, payload);
+        };
+    })();
+</script>
+<script id="myop_preview">
+    window.myop_init_interface({
+        teamData: [
+            { id: '1', initials: 'AR', name: 'Alex Rivera', title: 'Design Director', location: 'San Francisco, CA', tenure: '5.2y', experience: '12y', skills: ['Design Leadership', 'Strategy', 'Team Management'], avatarColor: '#9B59B6', profileImage: null },
+            { id: '2', initials: 'JP', name: 'Jamie Park', title: 'Product Designer', location: 'Seattle, WA', tenure: '1.5y', experience: '3y', skills: ['UI Design', 'Mobile Design', 'Prototyping'], avatarColor: '#3498DB', profileImage: null },
+            { id: '3', initials: 'SF', name: 'Sam Foster', title: 'UX Researcher', location: 'Austin, TX', tenure: '2.1y', experience: '4y', skills: ['User Research', 'Data Analysis', 'Usability Testing'], avatarColor: '#1ABC9C', profileImage: null },
+            { id: '4', initials: 'RK', name: 'Riley Kim', title: 'Senior Product Designer', location: 'New York, NY', tenure: '3.5y', experience: '7y', skills: ['Product Design', 'Design Systems', 'Accessibility'], avatarColor: '#E74C3C', profileImage: null },
+            { id: '5', initials: 'TB', name: 'Taylor Brooks', title: 'Senior UX Designer', location: 'Remote', tenure: '2.3y', experience: '5.5y', skills: ['UX Design', 'Information Architecture', 'Wireframing'], avatarColor: '#F39C12', profileImage: null },
+            { id: '6', initials: 'MC', name: 'Morgan Chen', title: 'UI/UX Designer', location: 'Los Angeles, CA', tenure: '1.8y', experience: '4y', skills: ['Visual Design', 'Branding', 'Illustration', 'Animation'], avatarColor: '#F1C40F', profileImage: null },
+            { id: '7', initials: 'JD', name: 'Jordan Davis', title: 'Product Manager', location: 'Boston, MA', tenure: '4.2y', experience: '9y', skills: ['Product Strategy', 'Roadmapping', 'Stakeholder Management'], avatarColor: '#2ECC71', profileImage: null },
+            { id: '8', initials: 'AS', name: 'Avery Smith', title: 'Design Researcher', location: 'Chicago, IL', tenure: '0.9y', experience: '2y', skills: ['Qualitative Research', 'Ethnography', 'Workshop Facilitation'], avatarColor: '#E67E22', profileImage: null },
+            { id: '9', initials: 'CM', name: 'Casey Martinez', title: 'Interaction Designer', location: 'Denver, CO', tenure: '2.7y', experience: '6y', skills: ['Interaction Design', 'Motion Design', 'Micro-interactions', 'Figma'], avatarColor: '#16A085', profileImage: null },
+            { id: '10', initials: 'PS', name: 'Peyton Sullivan', title: 'Content Designer', location: 'Portland, OR', tenure: '1.3y', experience: '3.5y', skills: ['UX Writing', 'Content Strategy', 'Voice & Tone'], avatarColor: '#8E44AD', profileImage: null },
+            { id: '11', initials: 'DR', name: 'Dakota Reed', title: 'Design Engineer', location: 'San Diego, CA', tenure: '3.1y', experience: '8y', skills: ['Front-end Development', 'React', 'CSS', 'Prototyping'], avatarColor: '#D35400', profileImage: null },
+            { id: '12', initials: 'EW', name: 'Emerson Wong', title: 'UX Strategist', location: 'Miami, FL', tenure: '4.5y', experience: '10y', skills: ['UX Strategy', 'Service Design', 'Business Analysis', 'Workshops'], avatarColor: '#27AE60', profileImage: null }
+        ],
+        isMobileView: false
+    });
+</script>
+</body>
+
+</html>

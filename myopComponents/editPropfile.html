@@ -1,0 +1,939 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile Panel Component</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: transparent;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        #app-root {
+            opacity: 1;
+        }
+
+        .profile-container {
+            width: 384px;
+            height: 100vh;
+            background: #FFF;
+            border-left: 1px solid rgba(0, 0, 0, 0.10);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.10), 0 4px 6px -4px rgba(0, 0, 0, 0.10);
+            overflow-y: auto;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        .profile-header {
+            padding: 16px 24px 16px 24px;
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+        }
+
+        .profile-info {
+            display: flex;
+            gap: 12px;
+            flex: 1;
+        }
+
+        .profile-avatar-wrapper {
+            position: relative;
+        }
+
+        .profile-avatar {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: #F6F6F8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: 500;
+            color: #363740;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+
+        .profile-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .upload-icon {
+            position: absolute;
+            bottom: -2px;
+            right: -2px;
+            width: 24px;
+            height: 24px;
+            background: white;
+            border-radius: 50%;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        .profile-container.is-editing .upload-icon {
+            display: flex;
+        }
+
+        .upload-icon svg {
+            width: 100%;
+            height: 100%;
+            color: #6B7280;
+        }
+
+        #imageUploadInput {
+            display: none;
+        }
+
+        .profile-details {
+            display: flex;
+            flex-direction: column;
+            gap: 0px;
+            padding-top: 4px;
+        }
+
+        .profile-name-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .profile-name {
+            color: #363740;
+            font-family: Inter;
+            font-size: 16px;
+            font-style: normal;
+            font-weight: 600;
+            line-height: 24px;
+            letter-spacing: -0.312px;
+        }
+
+        .profile-badge {
+            display: none;
+        }
+
+        .profile-title {
+            color: #717182;
+            font-family: Inter;
+            font-size: 14px;
+            font-style: normal;
+            font-weight: 400;
+            line-height: 20px;
+            letter-spacing: -0.15px;
+        }
+
+        .close-btn {
+            width: 32px;
+            height: 32px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #9CA3AF;
+            flex-shrink: 0;
+        }
+
+        .close-btn:hover {
+            background: #F3F4F6;
+        }
+
+        .action-buttons {
+            padding: 0 24px 16px 24px;
+            display: flex;
+            gap: 12px;
+        }
+
+        .action-btn {
+            display: inline-flex;
+            padding: 0px 18px;
+            height: 33px;
+            min-width: 120px;
+            align-items: center;
+            gap: 8px;
+            border-radius: 12px;
+            border: 1px solid #E5E7EB;
+            background: #FFF;
+            font-size: 15px;
+            font-weight: 400;
+            color: #111827;
+            cursor: pointer;
+            transition: all 0.2s;
+            justify-content: center;
+            white-space: nowrap;
+        }
+
+        .action-btn:hover {
+            background: #F9FAFB;
+            border-color: #D1D5DB;
+        }
+
+        .action-btn.delete {
+            color: #DC2626;
+        }
+
+        .action-btn.delete:hover {
+            background: #FEF2F2;
+            border-color: #FEE2E2;
+        }
+
+        .action-btn.primary {
+            background: #2C2C2E;
+            color: white;
+            border-color: #2C2C2E;
+        }
+
+        .action-btn.primary:hover {
+            background: #1C1C1E;
+        }
+
+        .action-btn svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        .divider {
+            height: 1px;
+            background: rgba(0, 0, 0, 0.08);
+            margin: 0 24px 24px 24px;
+        }
+
+        .content-section {
+            padding: 0 24px 24px 24px;
+        }
+
+        .content-section:not(:last-child) {
+            border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+            margin-bottom: 24px;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 500;
+            color: #111827;
+            line-height: 24px;
+            margin-bottom: 16px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: #374151;
+            margin-bottom: 8px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid #E5E7EB;
+            border-radius: 8px;
+            font-size: 15px;
+            color: #111827;
+            background: #FFF;
+            transition: all 0.2s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #2C2C2E;
+        }
+
+        .form-input.textarea {
+            min-height: 80px;
+            resize: vertical;
+            font-family: inherit;
+        }
+
+        .highlights-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .highlight-card {
+            background: #F9FAFB;
+            padding: 16px;
+            border-radius: 10px;
+        }
+
+        .highlight-label {
+            font-size: 12px;
+            font-weight: 400;
+            color: #6B7280;
+            margin-bottom: 4px;
+        }
+
+        .highlight-value {
+            font-size: 20px;
+            font-weight: 600;
+            color: #111827;
+        }
+
+        .skills-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .skill-tag {
+            display: inline-flex;
+            padding: 6px 12px;
+            border-radius: 8px;
+            background: #F3F4F6;
+            color: #374151;
+            font-size: 13px;
+            font-weight: 400;
+        }
+
+        .skill-tag.editable {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding-right: 8px;
+        }
+
+        .skill-remove-btn {
+            background: none;
+            border: none;
+            padding: 0;
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+            color: #6B7280;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .skill-remove-btn:hover {
+            color: #DC2626;
+        }
+
+        .skill-input-group {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .skill-input-group .form-input {
+            flex: 1;
+        }
+
+        .skill-input-group button {
+            padding: 10px 16px;
+            background: #2C2C2E;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .skill-input-group button:hover {
+            background: #1C1C1E;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 0;
+        }
+
+        .contact-icon {
+            width: 40px;
+            height: 40px;
+            background: #F3F4F6;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #6B7280;
+        }
+
+        .contact-icon svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        .contact-text {
+            font-size: 14px;
+            color: #111827;
+        }
+
+        .relationship-card {
+            padding: 16px;
+            background: #F9FAFB;
+            border-radius: 10px;
+        }
+
+        .relationship-text {
+            font-size: 14px;
+            color: #111827;
+            margin-bottom: 4px;
+        }
+
+        .relationship-subtext {
+            font-size: 12px;
+            color: #6B7280;
+        }
+
+        .view-mode-content {
+            display: block;
+        }
+
+        .edit-mode-content {
+            display: none;
+        }
+
+        .profile-container.is-editing .view-mode-content {
+            display: none;
+        }
+
+        .profile-container.is-editing .edit-mode-content {
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+<div id="app-root">
+    <div class="profile-container" id="profileContainer">
+        <div class="profile-header">
+            <div class="profile-info">
+                <div class="profile-avatar-wrapper">
+                    <div class="profile-avatar" id="profileAvatar">NA</div>
+                    <div class="upload-icon" id="uploadIcon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12" />
+                        </svg>
+                    </div>
+                    <input type="file" id="imageUploadInput" accept="image/*">
+                </div>
+                <div class="profile-details">
+                    <div class="profile-name-row">
+                        <span class="profile-name" id="profileName">Unknown</span>
+                        <span class="profile-badge" id="profileBadge">Member</span>
+                    </div>
+                    <div class="profile-title" id="profileTitle">No title</div>
+                </div>
+            </div>
+            <button class="close-btn" id="closeBtn">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                    <path d="M15 5L5 15M5 5l10 10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+            </button>
+        </div>
+
+        <div class="action-buttons view-mode-content">
+            <button class="action-btn delete" id="deleteBtn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/>
+                </svg>
+                Delete
+            </button>
+            <button class="action-btn primary" id="editBtn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                </svg>
+                Edit
+            </button>
+        </div>
+
+        <div class="action-buttons edit-mode-content">
+            <button class="action-btn" id="cancelBtn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                    <path d="M18 6L6 18M6 6l12 12"/>
+                </svg>
+                Cancel
+            </button>
+            <button class="action-btn primary" id="saveBtn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/>
+                    <polyline points="17 21 17 13 7 13 7 21"/>
+                    <polyline points="7 3 7 8 15 8"/>
+                </svg>
+                Save
+            </button>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="content-section">
+            <div class="section-title">Highlights</div>
+            <div class="view-mode-content">
+                <div class="highlights-grid">
+                    <div class="highlight-card">
+                        <div class="highlight-label">Experience</div>
+                        <div class="highlight-value" id="highlightExperience">0y</div>
+                    </div>
+                    <div class="highlight-card">
+                        <div class="highlight-label">Tenure</div>
+                        <div class="highlight-value" id="highlightTenure">0y</div>
+                    </div>
+                    <div class="highlight-card">
+                        <div class="highlight-label">Tenure Rank</div>
+                        <div class="highlight-value" id="highlightTenureRank">0%</div>
+                    </div>
+                    <div class="highlight-card">
+                        <div class="highlight-label">Team Size</div>
+                        <div class="highlight-value" id="highlightTeamSize">0</div>
+                    </div>
+                </div>
+            </div>
+            <div class="edit-mode-content">
+                <div class="highlights-grid">
+                    <div class="form-group">
+                        <label class="form-label">Experience</label>
+                        <input type="text" class="form-input" id="editExperience" placeholder="e.g., 5y">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Tenure</label>
+                        <input type="text" class="form-input" id="editTenure" placeholder="e.g., 2y">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Tenure Rank</label>
+                        <input type="text" class="form-input" id="editTenureRank" placeholder="e.g., 75%">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Team Size</label>
+                        <input type="text" class="form-input" id="editTeamSize" placeholder="e.g., 5">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-section">
+            <div class="section-title">About</div>
+            <div class="view-mode-content">
+                <p id="aboutText" style="font-size: 14px; color: #374151; line-height: 22px;">No description
+                    available.</p>
+            </div>
+            <div class="edit-mode-content">
+                <div class="form-group">
+                    <label class="form-label">Name</label>
+                    <input type="text" class="form-input" id="editName" placeholder="Full name">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Title</label>
+                    <input type="text" class="form-input" id="editTitle" placeholder="Job title">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">About</label>
+                    <textarea class="form-input textarea" id="editAbout" placeholder="Brief description"></textarea>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-section">
+            <div class="section-title">Skills</div>
+            <div class="view-mode-content">
+                <div class="skills-container" id="skillsListView"></div>
+            </div>
+            <div class="edit-mode-content">
+                <div class="skills-container" id="skillsListEdit"></div>
+                <div class="skill-input-group">
+                    <input type="text" class="form-input" id="newSkillInput" placeholder="Add a skill">
+                    <button id="addSkillBtn">Add</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-section">
+            <div class="section-title">Contact Information</div>
+            <div class="view-mode-content">
+                <div class="contact-item">
+                    <div class="contact-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+                            <path d="M22 6l-10 7L2 6" />
+                        </svg>
+                    </div>
+                    <div class="contact-text" id="contactEmail"></div>
+                </div>
+                <div class="contact-item">
+                    <div class="contact-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path
+                                    d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z" />
+                        </svg>
+                    </div>
+                    <div class="contact-text" id="contactPhone"></div>
+                </div>
+                <div class="contact-item">
+                    <div class="contact-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" />
+                            <circle cx="12" cy="10" r="3" />
+                        </svg>
+                    </div>
+                    <div class="contact-text" id="contactLocation"></div>
+                </div>
+            </div>
+            <div class="edit-mode-content">
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input type="email" class="form-input" id="editEmail" placeholder="email@example.com">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Phone</label>
+                    <input type="tel" class="form-input" id="editPhone" placeholder="+1 (555) 123-4567">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Location</label>
+                    <input type="text" class="form-input" id="editLocation" placeholder="City, State">
+                </div>
+            </div>
+        </div>
+
+        <div class="content-section">
+            <div class="section-title">Relationship</div>
+            <div class="relationship-card">
+                <div class="relationship-text" id="relationshipText"></div>
+                <div class="relationship-subtext" id="relationshipSubtext"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function() {
+        'use strict';
+        let state = {
+            profile: {
+                id: 'member-1',
+                initials: 'NA',
+                name: 'Unknown',
+                badge: 'Member',
+                title: 'No title',
+                experience: '0y',
+                tenure: '0y',
+                tenureRank: '0%',
+                teamSize: '0',
+                about: 'No description available.',
+                email: '',
+                phone: '',
+                location: '',
+                skills: [],
+                relationship: '',
+                relationshipType: '',
+                profileImage: null,
+                avatarColor: '#e0e0e0'
+            },
+            isEditing: false
+        };
+        const elements = {};
+
+        function cacheElements() {
+            elements.appRoot = document.getElementById('app-root');
+            elements.profileContainer = document.getElementById('profileContainer');
+            elements.profileAvatar = document.getElementById('profileAvatar');
+            elements.profileName = document.getElementById('profileName');
+            elements.profileBadge = document.getElementById('profileBadge');
+            elements.profileTitle = document.getElementById('profileTitle');
+            elements.highlightExperience = document.getElementById('highlightExperience');
+            elements.highlightTenure = document.getElementById('highlightTenure');
+            elements.highlightTenureRank = document.getElementById('highlightTenureRank');
+            elements.highlightTeamSize = document.getElementById('highlightTeamSize');
+            elements.aboutText = document.getElementById('aboutText');
+            elements.contactEmail = document.getElementById('contactEmail');
+            elements.contactPhone = document.getElementById('contactPhone');
+            elements.contactLocation = document.getElementById('contactLocation');
+            elements.relationshipText = document.getElementById('relationshipText');
+            elements.relationshipSubtext = document.getElementById('relationshipSubtext');
+            elements.skillsListView = document.getElementById('skillsListView');
+            elements.skillsListEdit = document.getElementById('skillsListEdit');
+            elements.editName = document.getElementById('editName');
+            elements.editTitle = document.getElementById('editTitle');
+            elements.editAbout = document.getElementById('editAbout');
+            elements.editExperience = document.getElementById('editExperience');
+            elements.editTenure = document.getElementById('editTenure');
+            elements.editTenureRank = document.getElementById('editTenureRank');
+            elements.editTeamSize = document.getElementById('editTeamSize');
+            elements.editEmail = document.getElementById('editEmail');
+            elements.editPhone = document.getElementById('editPhone');
+            elements.editLocation = document.getElementById('editLocation');
+            elements.newSkillInput = document.getElementById('newSkillInput');
+            elements.closeBtn = document.getElementById('closeBtn');
+            elements.editBtn = document.getElementById('editBtn');
+            elements.deleteBtn = document.getElementById('deleteBtn');
+            elements.cancelBtn = document.getElementById('cancelBtn');
+            elements.saveBtn = document.getElementById('saveBtn');
+            elements.addSkillBtn = document.getElementById('addSkillBtn');
+            elements.uploadIcon = document.getElementById('uploadIcon');
+            elements.imageUploadInput = document.getElementById('imageUploadInput');
+        }
+
+        function updateProfileImage() {
+            if (state.profile.profileImage) {
+                elements.profileAvatar.innerHTML = '<img src="' + state.profile.profileImage + '" alt="Profile">';
+            } else {
+                elements.profileAvatar.textContent = state.profile.initials || 'NA';
+            }
+        }
+
+        function renderSkillsView() {
+            elements.skillsListView.innerHTML = '';
+            if (state.profile.skills && state.profile.skills.length > 0) {
+                state.profile.skills.forEach(function(skill) {
+                    var tag = document.createElement('span');
+                    tag.className = 'skill-tag';
+                    tag.textContent = skill;
+                    elements.skillsListView.appendChild(tag);
+                });
+            }
+        }
+
+        function renderSkillsEdit() {
+            elements.skillsListEdit.innerHTML = '';
+            if (state.profile.skills && state.profile.skills.length > 0) {
+                state.profile.skills.forEach(function(skill, index) {
+                    var tag = document.createElement('span');
+                    tag.className = 'skill-tag editable';
+                    tag.innerHTML = skill + '<button class="skill-remove-btn" data-index="' + index + '"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 3L3 9M3 3L9 9"/></svg></button>';
+                    elements.skillsListEdit.appendChild(tag);
+                    var removeBtn = tag.querySelector('.skill-remove-btn');
+                    removeBtn.addEventListener('click', function() { removeSkill(index); });
+                });
+            }
+        }
+
+        function removeSkill(index) {
+            state.profile.skills.splice(index, 1);
+            renderSkillsEdit();
+        }
+
+        function addSkill() {
+            var skillName = elements.newSkillInput.value.trim();
+            if (skillName) {
+                if (!state.profile.skills) state.profile.skills = [];
+                state.profile.skills.push(skillName);
+                elements.newSkillInput.value = '';
+                renderSkillsEdit();
+            }
+        }
+
+        function updateEditMode() {
+            if (state.isEditing) {
+                elements.profileContainer.classList.add('is-editing');
+            } else {
+                elements.profileContainer.classList.remove('is-editing');
+            }
+        }
+
+        function getFormData() {
+            return {
+                ...state.profile,
+                name: elements.editName.value,
+                title: elements.editTitle.value,
+                experience: elements.editExperience.value,
+                tenure: elements.editTenure.value,
+                tenureRank: elements.editTenureRank.value,
+                teamSize: elements.editTeamSize.value,
+                about: elements.editAbout.value,
+                email: elements.editEmail.value,
+                phone: elements.editPhone.value,
+                location: elements.editLocation.value,
+                profileImage: state.profile.profileImage
+            };
+        }
+
+        function render() {
+            var profile = state.profile;
+            updateProfileImage();
+            elements.profileName.textContent = profile.name || 'Unknown';
+            elements.profileBadge.textContent = profile.badge || 'Member';
+            elements.profileTitle.textContent = profile.title || 'No title';
+            elements.highlightExperience.textContent = profile.experience || '0y';
+            elements.highlightTenure.textContent = profile.tenure || '0y';
+            elements.highlightTenureRank.textContent = profile.tenureRank || '0%';
+            elements.highlightTeamSize.textContent = profile.teamSize || '0';
+            elements.aboutText.textContent = profile.about || 'No description available.';
+            elements.contactEmail.textContent = profile.email || '';
+            elements.contactPhone.textContent = profile.phone || '';
+            elements.contactLocation.textContent = profile.location || '';
+            // Only populate edit fields when NOT in edit mode to preserve user input
+            if (!state.isEditing) {
+                elements.editExperience.value = profile.experience || '';
+                elements.editTenure.value = profile.tenure || '';
+                elements.editTenureRank.value = profile.tenureRank || '';
+                elements.editTeamSize.value = profile.teamSize || '';
+                elements.editName.value = profile.name || '';
+                elements.editTitle.value = profile.title || '';
+                elements.editAbout.value = profile.about || '';
+                elements.editEmail.value = profile.email || '';
+                elements.editPhone.value = profile.phone || '';
+                elements.editLocation.value = profile.location || '';
+                renderSkillsEdit();
+            }
+            renderSkillsView();
+            if (profile.relationship) {
+                elements.relationshipText.textContent = profile.relationship;
+                elements.relationshipSubtext.textContent = profile.relationshipType || '';
+            } else {
+                elements.relationshipText.textContent = 'Top-level employee';
+                elements.relationshipSubtext.textContent = 'No reporting manager';
+            }
+        }
+
+        function handleImageUpload(event) {
+            var file = event.target.files[0];
+            if (file) {
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    var base64Image = e.target.result;
+                    state.profile.profileImage = base64Image;
+                    updateProfileImage();
+                    if (typeof window.myop_cta_handler === 'function') {
+                        window.myop_cta_handler('image_updated', { id: state.profile.id, profileImage: base64Image });
+                    }
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function attachEventListeners() {
+            elements.closeBtn.addEventListener('click', function() {
+                if (typeof window.myop_cta_handler === 'function') window.myop_cta_handler('close', { profile: state.profile });
+            });
+            elements.editBtn.addEventListener('click', function() {
+                state.isEditing = true;
+                updateEditMode();
+                if (typeof window.myop_cta_handler === 'function') window.myop_cta_handler('edit_started', { profile: state.profile });
+            });
+            elements.deleteBtn.addEventListener('click', function() {
+                if (typeof window.myop_cta_handler === 'function') window.myop_cta_handler('delete', { profile: state.profile });
+            });
+            elements.cancelBtn.addEventListener('click', function() {
+                state.isEditing = false;
+                updateEditMode();
+                render();
+                if (typeof window.myop_cta_handler === 'function') window.myop_cta_handler('edit_cancelled', { profile: state.profile });
+            });
+            elements.saveBtn.addEventListener('click', function() {
+                var updatedData = getFormData();
+                state.profile = updatedData;
+                state.isEditing = false;
+                updateEditMode();
+                render();
+                if (typeof window.myop_cta_handler === 'function') window.myop_cta_handler('save', { profile: updatedData });
+            });
+            elements.addSkillBtn.addEventListener('click', addSkill);
+            elements.newSkillInput.addEventListener('keypress', function(e) { if (e.key === 'Enter') { e.preventDefault(); addSkill(); } });
+            elements.uploadIcon.addEventListener('click', function() { elements.imageUploadInput.click(); });
+            elements.imageUploadInput.addEventListener('change', handleImageUpload);
+        }
+
+        function initializeComponent(data) {
+            // Don't overwrite state when already in edit mode to preserve user input
+            if (state.isEditing) {
+                return;
+            }
+            if (data) {
+                if (data.profile) state.profile = { ...state.profile, ...data.profile };
+                if (typeof data.isEditing !== 'undefined') state.isEditing = data.isEditing;
+            }
+            render();
+            updateEditMode();
+        }
+
+        // Track if Myop has initialized the component
+        window.__myopInitCalled = false;
+
+        window.myop_init_interface = function(data) {
+            window.__myopInitCalled = true;
+
+            if (arguments.length === 0) return { profile: { ...state.profile }, isEditing: state.isEditing };
+            if (data && data.action) {
+                switch (data.action) {
+                    case 'setProfile': state.profile = { ...state.profile, ...data.payload }; render(); break;
+                    case 'setEditing': state.isEditing = data.payload; updateEditMode(); break;
+                    case 'updateImage': state.profile.profileImage = data.payload; updateProfileImage(); break;
+                    default: console.warn('Unknown action:', data.action);
+                }
+                return;
+            }
+            initializeComponent(data);
+        };
+
+        window.myop_cta_handler = function(actionId, payload) { console.log('CTA Handler called:', actionId, payload); };
+
+        function init() {
+            cacheElements();
+            attachEventListeners();
+            render();
+            console.log('EditProfile component ready');
+        }
+        if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', init); } else { init(); }
+    })();
+</script>
+
+<script id="myop_preview">
+    // Preview script - only runs when testing locally, not in Myop
+    setTimeout(function() {
+        // Only show demo data if Myop hasn't initialized the component
+        if (!window.__myopInitCalled) {
+            window.myop_init_interface({
+                profile: {
+                    id: 'member-123',
+                    initials: 'JD',
+                    name: 'John Doe',
+                    badge: 'Senior',
+                    title: 'Software Engineer',
+                    experience: '8y',
+                    tenure: '3y',
+                    tenureRank: '85%',
+                    teamSize: '12',
+                    about: 'Passionate software engineer with expertise in full-stack development.',
+                    email: 'john.doe@company.com',
+                    phone: '+1 (555) 123-4567',
+                    location: 'San Francisco, CA',
+                    skills: ['JavaScript', 'React', 'Node.js', 'Python', 'AWS'],
+                    relationship: 'Reports to Sarah Smith',
+                    relationshipType: 'Direct Report',
+                    profileImage: null
+                },
+                isEditing: false
+            });
+            window.myop_cta_handler = function(actionId, payload) {
+                console.log('Demo CTA:', actionId, payload);
+                if (actionId === 'save') alert('Profile saved!');
+                else if (actionId === 'delete') alert('Delete requested for: ' + payload.profile.name);
+                else if (actionId === 'close') alert('Close panel requested');
+            };
+        }
+    }, 100);
+</script>
+</body>
+
+</html>

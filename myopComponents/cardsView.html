@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cards Component</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: transparent;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+        }
+
+        #app-root {
+            height: 100%;
+        }
+
+        .main-container {
+            width: 100%;
+            max-width: 1440px;
+            height: 100%;
+            padding: 0;
+            margin: 0 auto;
+            background: transparent;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .cards-view {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-auto-rows: min-content;
+            gap: 16px;
+            overflow-y: auto;
+            overflow-x: hidden;
+            flex: 1;
+            -webkit-overflow-scrolling: touch;
+            padding-top: 4px;
+        }
+
+        .cards-view.empty {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            width: 100%;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #9ca3af;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .empty-state-text {
+            font-size: 22px;
+            font-weight: 500;
+            margin-bottom: 12px;
+        }
+
+        .empty-state-subtext {
+            font-size: 16px;
+            margin-bottom: 24px;
+        }
+
+        /* Add Member CTA Button */
+        .empty-state-cta {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 14px;
+            border-radius: 8px;
+            border: 1px solid rgba(0, 105, 95, 0.1);
+            background: linear-gradient(0deg, rgba(80, 255, 238, 0.10) 0%, rgba(80, 255, 238, 0.10) 100%), #FFF;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: inherit;
+            text-decoration: none;
+        }
+
+        .empty-state-cta:hover {
+            background: #50FFEE;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .empty-state-cta:active {
+            transform: scale(0.98);
+        }
+
+        .empty-state-cta-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .empty-state-cta-icon svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        .empty-state-cta-text {
+            font-size: 13px;
+            font-weight: 500;
+            color: #363740;
+            letter-spacing: -0.15px;
+        }
+
+        @media (max-width: 1200px) {
+            .cards-view {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 900px) {
+            .cards-view {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 600px) {
+            .cards-view {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+
+            .main-container {
+                padding: 0;
+            }
+
+            .member-card {
+                padding: 16px;
+                gap: 12px;
+                min-height: 160px;
+            }
+
+            .card-header {
+                gap: 10px;
+            }
+
+            .card-avatar {
+                width: 48px;
+                height: 48px;
+                font-size: 14px;
+            }
+
+            .card-name {
+                font-size: 13px;
+                line-height: 18px;
+            }
+
+            .card-title {
+                font-size: 11px;
+                line-height: 14px;
+            }
+
+            .card-details {
+                gap: 16px;
+                padding-top: 12px;
+            }
+
+            .card-detail-label {
+                font-size: 11px;
+                line-height: 14px;
+                gap: 4px;
+            }
+
+            .card-detail-icon {
+                width: 10px;
+                height: 10px;
+            }
+
+            .card-detail-value {
+                font-size: 13px;
+                line-height: 18px;
+                padding-left: 14px;
+            }
+
+            /* Empty State - Mobile */
+            .empty-state {
+                padding: 40px 20px;
+                width: 100%;
+            }
+
+            .empty-state-text {
+                font-size: 18px;
+            }
+
+            .empty-state-subtext {
+                font-size: 14px;
+                margin-bottom: 20px;
+                text-wrap: balance;
+                max-width: 240px;
+            }
+
+            .empty-state-cta {
+                padding: 7px 12px;
+                gap: 5px;
+            }
+
+            .empty-state-cta-icon svg {
+                width: 14px;
+                height: 14px;
+            }
+
+            .empty-state-cta-text {
+                font-size: 12px;
+            }
+        }
+
+        .member-card {
+            display: flex;
+            min-height: 187px;
+            padding: 20px;
+            justify-content: center;
+            align-items: center;
+            background: #FFFFFF;
+            border-radius: 12px;
+            border: 1px solid #E5E7EB;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .member-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        @media (hover: none) and (pointer: coarse) {
+            .member-card:active {
+                transform: scale(0.98);
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            }
+        }
+
+        .card-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .card-avatar {
+            width: 56px;
+            height: 56px;
+            border-radius: 16777200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            font-weight: 600;
+            color: white;
+            flex-shrink: 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        .card-avatar-initials {
+            position: relative;
+            z-index: 1;
+        }
+
+        .card-avatar.has-image .card-avatar-initials {
+            display: none;
+        }
+
+        .card-info {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .card-name {
+            color: #363740;
+            font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-size: 14px;
+            font-weight: 400;
+            line-height: 20px;
+            letter-spacing: -0.15px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .card-title {
+            color: #717182;
+            font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-size: 12px;
+            font-weight: 400;
+            line-height: 16px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .card-details {
+            display: flex;
+            gap: 24px;
+            padding-top: 14px;
+            border-top: 1px solid #F3F4F6;
+        }
+
+        .card-detail {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .card-detail-label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: #717182;
+            font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-size: 12px;
+            font-weight: 400;
+            line-height: 16px;
+        }
+
+        .card-detail-icon {
+            width: 12px;
+            height: 12px;
+            flex-shrink: 0;
+        }
+
+        .card-detail-value {
+            color: #363740;
+            font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-size: 14px;
+            font-weight: 400;
+            line-height: 20px;
+            letter-spacing: -0.15px;
+            padding-left: 18px;
+        }
+
+        .cards-view::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .cards-view::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .cards-view::-webkit-scrollbar-thumb {
+            background: transparent;
+            border-radius: 3px;
+            transition: background 0.3s ease;
+        }
+
+        .cards-view:hover::-webkit-scrollbar-thumb {
+            background: #E5E7EB;
+        }
+
+        .cards-view::-webkit-scrollbar-thumb:hover {
+            background: #D1D5DB;
+        }
+
+        .cards-view {
+            scrollbar-width: thin;
+            scrollbar-color: transparent transparent;
+        }
+
+        .cards-view:hover {
+            scrollbar-color: #E5E7EB transparent;
+        }
+    </style>
+</head>
+
+<body>
+<div id="app-root">
+    <div class="main-container">
+        <div id="cardsView" class="cards-view"></div>
+    </div>
+</div>
+<script>
+    (function() {
+        // Private state
+        let state = {
+            teamMembers: [],
+            config: {},
+            isMobileView: false
+        };
+
+        // DOM references
+        const cardsViewEl = document.getElementById('cardsView');
+
+        // Add member icon SVG
+        const addMemberIcon = '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M13.3333 17.5V15.8333C13.3333 14.9493 12.9821 14.1014 12.357 13.4763C11.7319 12.8512 10.884 12.5 9.99996 12.5H4.99996C4.1159 12.5 3.26806 12.8512 2.64294 13.4763C2.01782 14.1014 1.66663 14.9493 1.66663 15.8333V17.5" stroke="#363740" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round"/><path d="M7.49996 9.16667C9.34091 9.16667 10.8333 7.67428 10.8333 5.83333C10.8333 3.99238 9.34091 2.5 7.49996 2.5C5.65901 2.5 4.16663 3.99238 4.16663 5.83333C4.16663 7.67428 5.65901 9.16667 7.49996 9.16667Z" stroke="#363740" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round"/><path d="M15.8334 6.66797V11.668" stroke="#363740" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round"/><path d="M18.3334 9.16797H13.3334" stroke="#363740" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+        function getAvatarColor(member) {
+            if (member.avatarColor) return member.avatarColor;
+            const role = member.role ? member.role.toLowerCase().trim() : 'team';
+            if (role === 'manager') return '#AD46FF';
+            if (role === 'team' || role === 'team member') return '#2B7FFF';
+            if (role === 'peer' || role === 'you') return '#F9D716';
+            return '#2B7FFF';
+        }
+
+        function createCardHTML(member) {
+            const avatarColor = getAvatarColor(member);
+            const hasImage = member.profileImage ? 'has-image' : '';
+            const avatarContent = member.profileImage ? '<img src="' + member.profileImage + '" alt="' + member.name + '" />' : '';
+            return '<div class="card-header"><div class="card-avatar ' + hasImage + '" style="background: ' + avatarColor + '">' + avatarContent + '<div class="card-avatar-initials">' + member.initials + '</div></div><div class="card-info"><div class="card-name">' + member.name + '</div><div class="card-title">' + member.title + '</div></div></div><div class="card-details"><div class="card-detail"><div class="card-detail-label"><svg class="card-detail-icon" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="1.5" y="2.5" width="9" height="8" rx="1.5" stroke="#AD46FF" stroke-width="1" fill="none"/><path d="M4 1V3M8 1V3" stroke="#AD46FF" stroke-width="1" stroke-linecap="round"/><path d="M1.5 4.5H10.5" stroke="#AD46FF" stroke-width="1" stroke-linecap="round"/></svg>Tenure</div><div class="card-detail-value">' + member.tenure + '</div></div><div class="card-detail"><div class="card-detail-label"><svg class="card-detail-icon" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 1L7.5 4.5L11 5L8.5 7.5L9 11L6 9L3 11L3.5 7.5L1 5L4.5 4.5L6 1Z" stroke="#3B82F6" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>Experience</div><div class="card-detail-value">' + member.experience + '</div></div></div>';
+        }
+
+        function handleAddMemberClick() {
+            window.myop_cta_handler('addMember', {});
+        }
+
+        function handleMemberClick(member, index) {
+            window.myop_cta_handler('member_clicked', { member: member, index: index });
+        }
+
+        function render() {
+            // Update mobile view
+            if (state.isMobileView) {
+                document.body.classList.add('mobile-view');
+            } else {
+                document.body.classList.remove('mobile-view');
+            }
+
+            // Render cards
+            if (!state.teamMembers || state.teamMembers.length === 0) {
+                cardsViewEl.classList.add('empty');
+                cardsViewEl.innerHTML =
+                    '<div class="empty-state">' +
+                    '<div class="empty-state-text">No Team Data</div>' +
+                    '<div class="empty-state-subtext">Team members will appear here once data is loaded</div>' +
+                    '<button class="empty-state-cta" id="addMemberBtn">' +
+                    '<div class="empty-state-cta-icon">' + addMemberIcon + '</div>' +
+                    '<span class="empty-state-cta-text">Add New Member</span>' +
+                    '</button>' +
+                    '</div>';
+                const addBtn = document.getElementById('addMemberBtn');
+                if (addBtn) {
+                    addBtn.addEventListener('click', handleAddMemberClick);
+                }
+                return;
+            }
+
+            cardsViewEl.classList.remove('empty');
+            cardsViewEl.innerHTML = '';
+            state.teamMembers.forEach(function(member, index) {
+                const card = document.createElement('div');
+                card.className = 'member-card';
+                card.setAttribute('data-member-id', member.id);
+                card.onclick = function() { handleMemberClick(member, index); };
+                card.innerHTML = createCardHTML(member);
+                cardsViewEl.appendChild(card);
+            });
+        }
+
+        function renderSingleCard(member, index) {
+            const existingCard = cardsViewEl.children[index];
+            if (existingCard) {
+                existingCard.innerHTML = createCardHTML(member);
+                existingCard.onclick = function() { handleMemberClick(member, index); };
+            }
+        }
+
+        function initializeComponent(data) {
+            state = {
+                teamMembers: data.teamMembers || (Array.isArray(data) ? data : []),
+                config: data.config || {},
+                isMobileView: data.isMobileView || false
+            };
+            render();
+        }
+
+        // Public API
+        window.myop_init_interface = function(data) {
+            if (!data) {
+                return { ...state };
+            }
+
+            if (data.action) {
+                switch (data.action) {
+                    case 'setData':
+                        state.teamMembers = data.payload || [];
+                        render();
+                        break;
+                    case 'updateMember':
+                        if (data.payload && data.payload.id) {
+                            const memberIndex = state.teamMembers.findIndex(m => m.id === data.payload.id);
+                            if (memberIndex !== -1) {
+                                state.teamMembers[memberIndex] = { ...state.teamMembers[memberIndex], ...data.payload };
+                                renderSingleCard(state.teamMembers[memberIndex], memberIndex);
+                            }
+                        }
+                        break;
+                    case 'addMember':
+                        if (data.payload) {
+                            state.teamMembers.push(data.payload);
+                            render();
+                        }
+                        break;
+                    case 'removeMember':
+                        if (data.payload && data.payload.id) {
+                            state.teamMembers = state.teamMembers.filter(m => m.id !== data.payload.id);
+                            render();
+                        }
+                        break;
+                    default:
+                        console.warn('CardsView: Unknown action:', data.action);
+                }
+                return;
+            }
+
+            initializeComponent(data);
+        };
+
+        window.myop_cta_handler = function(actionId, payload) {
+            console.log('CTA Handler:', actionId, payload);
+        };
+    })();
+</script>
+
+<!-- Mock Data for Preview -->
+<script id="myop_preview">
+    window.myop_init_interface({
+        teamMembers: [
+            { id: 'demo-1', initials: 'JS', name: 'Jordan Smith', title: 'Product Designer', location: 'San Francisco, CA', tenure: '2.5y', experience: '6y', role: 'Team', avatarColor: '#3B82F6', profileImage: null },
+            { id: 'demo-2', initials: 'AC', name: 'Alex Chen', title: 'Lead Designer', location: 'Seattle, WA', tenure: '4.2y', experience: '9y', role: 'Manager', avatarColor: '#AD46FF', profileImage: null },
+            { id: 'demo-3', initials: 'SP', name: 'Sam Patel', title: 'UX Designer', location: 'Austin, TX', tenure: '1.6y', experience: '3.5y', role: 'Team', avatarColor: '#10B981', profileImage: null },
+            { id: 'demo-4', initials: 'RK', name: 'Riley Kim', title: 'Senior Product Designer', location: 'New York, NY', tenure: '3.5y', experience: '7y', role: 'Senior Member', avatarColor: '#E74C3C', profileImage: null }
+        ],
+        config: {},
+        isMobileView: false
+    });
+</script>
+</body>
+
+</html>

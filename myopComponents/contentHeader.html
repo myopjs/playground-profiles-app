@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="myop:size" content='{"width":"100%","height":44,"minHeight":44,"maxHeight":60}'>
+
+    <script type="myop/types">
+        // =============================================================================
+    // MYOP COMPONENT TYPE DEFINITIONS
+    // =============================================================================
+
+    /**
+     * Data structure passed to myop_init_interface(data)
+     */
+    interface MyopInitData {
+        title: string;
+        activeView: 'table' | 'cards' | 'tree';
+    }
+
+    /**
+     * Actions and payloads for myop_cta_handler(action, payload)
+     */
+    interface MyopCtaPayloads {
+        'view-changed': { view: 'table' | 'cards' | 'tree' };
+    }
+
+    // =============================================================================
+    // DO NOT EDIT BELOW - Standard Myop type declarations
+    // =============================================================================
+
+    declare function myop_init_interface(): MyopInitData;
+    declare function myop_init_interface(data: MyopInitData): void;
+
+    declare function myop_cta_handler<K extends keyof MyopCtaPayloads>(
+        action: K,
+        payload: MyopCtaPayloads[K]
+    ): void;
+    </script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        #app-root {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 8px;
+            gap: 12px;
+        }
+
+        .title {
+            font-size: 20px;
+            font-weight: 400;
+            line-height: 28px;
+            color: #363740;
+            letter-spacing: -0.45px;
+            flex: 1;
+            min-width: 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .toggle-container {
+            display: flex;
+            align-items: center;
+            background: #f6f6f8;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            border-radius: 10px;
+            padding: 4px 5px;
+            gap: 0;
+            flex-shrink: 0;
+        }
+
+        .toggle-button {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 0 12px;
+            height: 36px;
+            border: none;
+            background: transparent;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.15s ease;
+        }
+
+        .toggle-button.active {
+            background: #ffffff;
+        }
+
+        .toggle-button:hover:not(.active) {
+            background: rgba(255, 255, 255, 0.5);
+        }
+
+        .toggle-button svg {
+            width: 16px;
+            height: 16px;
+            flex-shrink: 0;
+        }
+
+        .toggle-button .label {
+            font-size: 14px;
+            font-weight: 400;
+            line-height: 20px;
+            letter-spacing: -0.15px;
+            color: #717182;
+        }
+
+        .toggle-button.active .label {
+            color: #363740;
+        }
+
+        .toggle-button.active svg path,
+        .toggle-button.active svg rect {
+            stroke: #363740;
+        }
+
+        .toggle-button:not(.active) svg path,
+        .toggle-button:not(.active) svg rect {
+            stroke: #717182;
+        }
+
+        /* Mobile Styles */
+        @media (max-width: 480px) {
+            #app-root {
+                padding: 0 12px;
+                gap: 10px;
+            }
+
+            .title {
+                font-size: 18px;
+                line-height: 24px;
+            }
+
+            .toggle-container {
+                padding: 3px 4px;
+                border-radius: 8px;
+            }
+
+            .toggle-button {
+                padding: 0 10px;
+                height: 32px;
+                gap: 0;
+            }
+
+            .toggle-button .label {
+                display: none;
+            }
+
+            .toggle-button svg {
+                width: 18px;
+                height: 18px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+<div id="app-root"></div>
+
+<script>
+    (function() {
+        let currentState = {
+            title: 'Your Team',
+            activeView: 'table'
+        };
+
+        const tableIcon = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M2 8H2.00667" stroke="currentColor" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M2 12H2.00667" stroke="currentColor" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M2 4H2.00667" stroke="currentColor" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M5.33301 8H13.9997" stroke="currentColor" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M5.33301 12H13.9997" stroke="currentColor" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M5.33301 4H13.9997" stroke="currentColor" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>`;
+
+        const cardsIcon = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M6 2H2.66667C2.29848 2 2 2.29848 2 2.66667V6C2 6.36819 2.29848 6.66667 2.66667 6.66667H6C6.36819 6.66667 6.66667 6.36819 6.66667 6V2.66667C6.66667 2.29848 6.36819 2 6 2Z" stroke="currentColor" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M13.333 2H9.99967C9.63148 2 9.33301 2.29848 9.33301 2.66667V6C9.33301 6.36819 9.63148 6.66667 9.99967 6.66667H13.333C13.7012 6.66667 13.9997 6.36819 13.9997 6V2.66667C13.9997 2.29848 13.7012 2 13.333 2Z" stroke="currentColor" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M13.333 9.33398H9.99967C9.63148 9.33398 9.33301 9.63246 9.33301 10.0007V13.334C9.33301 13.7022 9.63148 14.0007 9.99967 14.0007H13.333C13.7012 14.0007 13.9997 13.7022 13.9997 13.334V10.0007C13.9997 9.63246 13.7012 9.33398 13.333 9.33398Z" stroke="currentColor" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M6 9.33301H2.66667C2.29848 9.33301 2 9.63148 2 9.99967V13.333C2 13.7012 2.29848 13.9997 2.66667 13.9997H6C6.36819 13.9997 6.66667 13.7012 6.66667 13.333V9.99967C6.66667 9.63148 6.36819 9.33301 6 9.33301Z" stroke="currentColor" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>`;
+
+        const treeIcon = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M11.3329 9.33333L13.3329 11.5333C13.4242 11.6265 13.4863 11.7445 13.5112 11.8725C13.5362 12.0006 13.523 12.1332 13.4733 12.2539C13.4236 12.3746 13.3396 12.478 13.2317 12.5514C13.1238 12.6247 12.9967 12.6648 12.8662 12.6667H3.13289C3.0024 12.6648 2.87533 12.6247 2.76741 12.5514C2.6595 12.478 2.57549 12.3746 2.5258 12.2539C2.47611 12.1332 2.46293 12.0006 2.4879 11.8725C2.51286 11.7445 2.57486 11.6265 2.66622 11.5333L4.66622 9.33333H4.46622C4.33574 9.3315 4.20866 9.29141 4.10075 9.21804C3.99283 9.14467 3.90882 9.04123 3.85913 8.92057C3.80945 8.7999 3.79627 8.6673 3.82123 8.53921C3.84619 8.41113 3.90819 8.29318 3.99956 8.2L5.99956 6H5.86622C5.73005 6.01228 5.5934 5.9824 5.47479 5.91441C5.35617 5.84642 5.26133 5.7436 5.20311 5.61989C5.1449 5.49619 5.12613 5.35757 5.14934 5.22284C5.17255 5.0881 5.23663 4.96376 5.33289 4.86667L7.99956 2L10.6662 4.86667C10.7625 4.96376 10.8266 5.0881 10.8498 5.22284C10.873 5.35757 10.8542 5.49619 10.796 5.61989C10.7378 5.7436 10.6429 5.84642 10.5243 5.91441C10.4057 5.9824 10.2691 6.01228 10.1329 6H9.99956L11.9996 8.2C12.0909 8.29318 12.1529 8.41113 12.1779 8.53921C12.2028 8.6673 12.1897 8.7999 12.14 8.92057C12.0903 9.04123 12.0063 9.14467 11.8984 9.21804C11.7905 9.29141 11.6634 9.3315 11.5329 9.33333H11.3329Z" stroke="currentColor" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M8 14.667V12.667" stroke="currentColor" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>`;
+
+        function render(data) {
+            const container = document.getElementById('app-root');
+
+            const html = `
+                <h2 class="title" title="${escapeHtml(data.title)}">${escapeHtml(data.title)}</h2>
+                <div class="toggle-container">
+                    <button class="toggle-button ${data.activeView === 'tree' ? 'active' : ''}" data-view="tree" title="Tree view">
+                        ${treeIcon}
+                        <span class="label">Tree</span>
+                    </button>
+                    <button class="toggle-button ${data.activeView === 'table' ? 'active' : ''}" data-view="table" title="Table view">
+                        ${tableIcon}
+                        <span class="label">Table</span>
+                    </button>
+                    <button class="toggle-button ${data.activeView === 'cards' ? 'active' : ''}" data-view="cards" title="Cards view">
+                        ${cardsIcon}
+                        <span class="label">Cards</span>
+                    </button>
+                </div>
+            `;
+
+            container.innerHTML = html;
+            attachEventListeners();
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function attachEventListeners() {
+            const buttons = document.querySelectorAll('.toggle-button');
+            buttons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const view = this.dataset.view;
+                    if (view !== currentState.activeView) {
+                        currentState.activeView = view;
+                        render(currentState);
+                        window.myop_cta_handler('view-changed', { view: view });
+                    }
+                });
+            });
+        }
+
+        // Public API
+        window.myop_init_interface = function(data) {
+            if (!data) return currentState;
+            currentState = { ...currentState, ...data };
+            render(currentState);
+        };
+
+        window.myop_cta_handler = function(action_id, payload) {
+            // Will be overridden by host application
+            console.log('CTA:', action_id, payload);
+        };
+    })();
+</script>
+
+<!-- Preview script - replaced in production -->
+<script id="myop_preview">
+    window.myop_init_interface({
+        title: 'Your Team',
+        activeView: 'table'
+    });
+</script>
+</body>
+
+</html>

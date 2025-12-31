@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Header & Insights Component</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            width: 100%;
+            height: 100%;
+            background: transparent;
+            overflow: visible;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+        }
+
+        .main-container {
+            width: 100%;
+            max-width: 1223px;
+            padding: 24px 5px;
+            margin: 0 auto;
+            background: transparent;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .header {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 12px;
+            flex-shrink: 0;
+        }
+
+        .welcome-title {
+            color: #363740;
+            font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-size: 32px;
+            font-weight: 400;
+            line-height: 48px;
+            letter-spacing: 0.406px;
+        }
+
+        .stats-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .stat-item {
+            display: flex;
+            height: 32px;
+            padding: 0 12px;
+            align-items: center;
+            gap: 6px;
+            border-radius: 9999px;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            background: #FFF;
+            font-size: 14px;
+            white-space: nowrap;
+        }
+
+        .stat-icon {
+            width: 14px;
+            height: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .stat-icon svg {
+            width: 14px;
+            height: 14px;
+        }
+
+        .stat-value {
+            color: #363740;
+            font-family: Inter, sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            line-height: 20px;
+            letter-spacing: -0.15px;
+        }
+
+        .stat-label {
+            color: #717182;
+            font-family: Inter, sans-serif;
+            font-size: 14px;
+            font-weight: 400;
+            line-height: 20px;
+            letter-spacing: -0.15px;
+        }
+
+        .action-cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            width: 100%;
+        }
+
+        .action-card {
+            display: flex;
+            min-height: 80px;
+            padding: 16px 20px;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 10px;
+            border: 1px solid rgba(0, 105, 95, 0.05);
+            background: linear-gradient(0deg, rgba(80, 255, 238, 0.10) 0%, rgba(80, 255, 238, 0.10) 100%), #FFF;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            pointer-events: auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .action-card:hover {
+            background: #50FFEE;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.10), 0 1px 2px -1px rgba(0, 0, 0, 0.10);
+        }
+
+        .action-card-content {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .action-icon {
+            width: 44px;
+            height: 44px;
+            background: white;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .action-icon svg {
+            width: 22px;
+            height: 22px;
+        }
+
+        .action-text {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .action-text h3 {
+            color: #141415;
+            font-family: Inter, sans-serif;
+            font-size: 14px;
+            font-weight: 400;
+            line-height: 20px;
+            letter-spacing: -0.15px;
+            margin-bottom: 2px;
+        }
+
+        .action-text p {
+            color: #363740;
+            font-family: Inter, sans-serif;
+            font-size: 12px;
+            font-weight: 400;
+            line-height: 16px;
+        }
+
+        .action-arrow {
+            width: 24px;
+            height: 24px;
+            color: #0a8270;
+            flex-shrink: 0;
+        }
+
+        /* Mobile styles - applied via isMobileView prop */
+        body.mobile-view .main-container {
+            padding: 16px;
+            gap: 16px;
+        }
+
+        body.mobile-view .header {
+            gap: 12px;
+        }
+
+        body.mobile-view .welcome-title {
+            font-size: 24px;
+            line-height: 36px;
+        }
+
+        /* Mobile stats - flex wrap, auto-width items */
+        body.mobile-view .stats-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            width: 100%;
+        }
+
+        body.mobile-view .stat-item {
+            height: 32px;
+            padding: 0 10px;
+            gap: 6px;
+        }
+
+        body.mobile-view .stat-icon {
+            width: 12px;
+            height: 12px;
+        }
+
+        body.mobile-view .stat-icon svg {
+            width: 12px;
+            height: 12px;
+        }
+
+        body.mobile-view .stat-value {
+            font-size: 13px;
+            line-height: 18px;
+        }
+
+        body.mobile-view .stat-label {
+            font-size: 12px;
+            line-height: 18px;
+        }
+
+        body.mobile-view .action-cards {
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        body.mobile-view .action-card {
+            min-height: auto;
+            padding: 14px 6px 12px;
+            justify-content: center;
+            flex-direction: column;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body.mobile-view .action-card:hover {
+            background: linear-gradient(0deg, rgba(80, 255, 238, 0.10) 0%, rgba(80, 255, 238, 0.10) 100%), #FFF;
+        }
+
+        body.mobile-view .action-card-content {
+            flex-direction: column;
+            gap: 8px;
+            text-align: center;
+        }
+
+        body.mobile-view .action-icon {
+            width: 36px;
+            height: 36px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+        }
+
+        body.mobile-view .action-icon svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        body.mobile-view .action-text {
+            display: block;
+        }
+
+        body.mobile-view .action-text h3 {
+            font-size: 11px;
+            font-weight: 500;
+            line-height: 14px;
+            margin-bottom: 0;
+            color: #363740;
+        }
+
+        body.mobile-view .action-text p {
+            display: none;
+        }
+
+        body.mobile-view .action-arrow {
+            display: none;
+        }
+
+        /* Smaller text at narrow desktop widths to prevent wrapping */
+        @media (max-width: 1100px) {
+            .action-text h3 {
+                font-size: 13px;
+            }
+
+            .action-text p {
+                font-size: 11px;
+            }
+        }
+
+        @media (max-width: 1000px) {
+            .action-text p {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+<div id="app-root">
+    <div class="main-container">
+        <div class="header">
+            <h1 class="welcome-title" id="welcomeTitle">Welcome!</h1>
+            <div class="stats-row" id="statsRow">
+                <div class="stat-item" data-stat="experience">
+                    <div class="stat-icon"><svg viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                                d="M5.79651 9.04311C5.74443 8.84124 5.63921 8.65701 5.49178 8.50959C5.34436 8.36217 5.16013 8.25694 4.95826 8.20486L1.37951 7.28203C1.31845 7.2647 1.26471 7.22793 1.22645 7.17729C1.18818 7.12665 1.16748 7.06492 1.16748 7.00145C1.16748 6.93798 1.18818 6.87624 1.22645 6.8256C1.26471 6.77497 1.31845 6.73819 1.37951 6.72086L4.95826 5.79745C5.16006 5.74542 5.34424 5.64028 5.49166 5.49297C5.63907 5.34566 5.74434 5.16155 5.79651 4.95978L6.71934 1.38103C6.7365 1.31973 6.77323 1.26573 6.82394 1.22726C6.87466 1.18879 6.93656 1.16797 7.00022 1.16797C7.06387 1.16797 7.12577 1.18879 7.17649 1.22726C7.2272 1.26573 7.26394 1.31973 7.28109 1.38103L8.20334 4.95978C8.25542 5.16166 8.36064 5.34589 8.50806 5.49331C8.65549 5.64073 8.83972 5.74595 9.04159 5.79803L12.6203 6.72028C12.6819 6.73726 12.6862 6.77395 12.7748 6.82474C12.8135 6.87553 12.8345 6.93761 12.8345 7.00145C12.8345 7.06529 12.8135 7.12736 12.7748 7.17815C12.7362 7.22894 12.6819 7.26564 12.6203 7.28261L9.04159 8.20486C8.83972 8.25694 8.65549 8.36217 8.50806 8.50959C8.36064 8.65701 8.25542 8.84124 8.20334 9.04311L7.28051 12.6219C7.26335 12.6832 7.22662 12.7372 7.1759 12.7756C7.12519 12.8141 7.06329 12.8349 6.99963 12.8349C6.93598 12.8349 6.87407 12.8141 6.82336 12.7756C6.77265 12.7372 6.73591 12.6832 6.71876 12.6219L5.79651 9.04311Z"
+                                stroke="currentColor" stroke-width="1.16667" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                    </svg></div>
+                    <span><span class="stat-value" id="experienceValue">0</span>
+                        <span class="stat-label" id="experienceLabel">Experience</span></span>
+                </div>
+                <div class="stat-item" data-stat="members">
+                    <div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                stroke-width="2">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                        <circle cx="9" cy="7" r="4" />
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                    </svg></div>
+                    <span><span class="stat-value" id="membersValue">0</span>
+                        <span class="stat-label" id="membersLabel">Members</span></span>
+                </div>
+                <div class="stat-item" data-stat="skills">
+                    <div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                stroke-width="2">
+                        <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
+                    </svg></div>
+                    <span><span class="stat-value" id="skillsValue">0</span>
+                        <span class="stat-label" id="skillsLabel">Skills</span></span>
+                </div>
+                <div class="stat-item" data-stat="projects">
+                    <div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                stroke-width="2">
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                        <polyline points="22 4 12 14.01 9 11.01" />
+                    </svg></div>
+                    <span><span class="stat-value" id="projectsValue">0</span>
+                        <span class="stat-label" id="projectsLabel">Projects</span></span>
+                </div>
+            </div>
+        </div>
+        <div class="action-cards" id="actionCards">
+            <div class="action-card" data-action="addMember">
+                <div class="action-card-content">
+                    <div class="action-icon"><svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                        <path
+                                d="M13.3333 17.5V15.8333C13.3333 14.9493 12.9821 14.1014 12.357 13.4763C11.7319 12.8512 10.884 12.5 9.99996 12.5H4.99996C4.1159 12.5 3.26806 12.8512 2.64294 13.4763C2.01782 14.1014 1.66663 14.9493 1.66663 15.8333V17.5"
+                                stroke="#363740" stroke-width="1.66667" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                        <path
+                                d="M7.49996 9.16667C9.34091 9.16667 10.8333 7.67428 10.8333 5.83333C10.8333 3.99238 9.34091 2.5 7.49996 2.5C5.65901 2.5 4.16663 3.99238 4.16663 5.83333C4.16663 7.67428 5.65901 9.16667 7.49996 9.16667Z"
+                                stroke="#363740" stroke-width="1.66667" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                        <path d="M15.8334 6.66797V11.668" stroke="#363740" stroke-width="1.66667"
+                              stroke-linecap="round" stroke-linejoin="round" />
+                        <path d="M18.3334 9.16797H13.3334" stroke="#363740" stroke-width="1.66667"
+                              stroke-linecap="round" stroke-linejoin="round" />
+                    </svg></div>
+                    <div class="action-text">
+                        <h3>Add New Member</h3>
+                        <p>Invite someone to your team</p>
+                    </div>
+                </div>
+                <svg class="action-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="5" y1="12" x2="19" y2="12" />
+                    <polyline points="12 5 19 12 12 19" />
+                </svg>
+            </div>
+            <div class="action-card" data-action="viewHighlights">
+                <div class="action-card-content">
+                    <div class="action-icon"><svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                        <path
+                                d="M2.5 2.5V15.8333C2.5 16.2754 2.67559 16.6993 2.98816 17.0118C3.30072 17.3244 3.72464 17.5 4.16667 17.5H17.5"
+                                stroke="#363740" stroke-width="1.66667" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                        <path d="M15 14.1667V7.5" stroke="#363740" stroke-width="1.66667" stroke-linecap="round"
+                              stroke-linejoin="round" />
+                        <path d="M10.8334 14.168V4.16797" stroke="#363740" stroke-width="1.66667"
+                              stroke-linecap="round" stroke-linejoin="round" />
+                        <path d="M6.66663 14.168V11.668" stroke="#363740" stroke-width="1.66667"
+                              stroke-linecap="round" stroke-linejoin="round" />
+                    </svg></div>
+                    <div class="action-text">
+                        <h3>View Highlights</h3>
+                        <p>Insights & team trends</p>
+                    </div>
+                </div>
+                <svg class="action-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="5" y1="12" x2="19" y2="12" />
+                    <polyline points="12 5 19 12 12 19" />
+                </svg>
+            </div>
+            <div class="action-card" data-action="shareTeam">
+                <div class="action-card-content">
+                    <div class="action-icon"><svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                        <path
+                                d="M15 6.66797C16.3807 6.66797 17.5 5.54868 17.5 4.16797C17.5 2.78726 16.3807 1.66797 15 1.66797C13.6193 1.66797 12.5 2.78726 12.5 4.16797C12.5 5.54868 13.6193 6.66797 15 6.66797Z"
+                                stroke="#363740" stroke-width="1.66667" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                        <path
+                                d="M5 12.5C6.38071 12.5 7.5 11.3807 7.5 10C7.5 8.61929 6.38071 7.5 5 7.5C3.61929 7.5 2.5 8.61929 2.5 10C2.5 11.3807 3.61929 12.5 5 12.5Z"
+                                stroke="#363740" stroke-width="1.66667" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                        <path
+                                d="M15 18.332C16.3807 18.332 17.5 17.2127 17.5 15.832C17.5 14.4513 16.3807 13.332 15 13.332C13.6193 13.332 12.5 14.4513 12.5 15.832C12.5 17.2127 13.6193 18.332 15 18.332Z"
+                                stroke="#363740" stroke-width="1.66667" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                        <path d="M7.15833 11.2578L12.85 14.5745" stroke="#363740" stroke-width="1.66667"
+                              stroke-linecap="round" stroke-linejoin="round" />
+                        <path d="M12.8417 5.42578L7.15833 8.74245" stroke="#363740" stroke-width="1.66667"
+                              stroke-linecap="round" stroke-linejoin="round" />
+                    </svg></div>
+                    <div class="action-text">
+                        <h3>Share Team</h3>
+                        <p>Copy link to share</p>
+                    </div>
+                </div>
+                <svg class="action-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="5" y1="12" x2="19" y2="12" />
+                    <polyline points="12 5 19 12 12 19" />
+                </svg>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    (function() {
+        'use strict';
+        var state = {
+            userName: 'User',
+            stats: {
+                experience: { value: '0', label: 'Experience' },
+                members: { value: 0, label: 'Members' },
+                skills: { value: 0, label: 'Skills' },
+                projects: { value: 0, label: 'Projects' }
+            }
+        };
+        var elements = {};
+
+        function cacheElements() {
+            elements.appRoot = document.getElementById('app-root');
+            elements.welcomeTitle = document.getElementById('welcomeTitle');
+            elements.experienceValue = document.getElementById('experienceValue');
+            elements.experienceLabel = document.getElementById('experienceLabel');
+            elements.membersValue = document.getElementById('membersValue');
+            elements.membersLabel = document.getElementById('membersLabel');
+            elements.skillsValue = document.getElementById('skillsValue');
+            elements.skillsLabel = document.getElementById('skillsLabel');
+            elements.projectsValue = document.getElementById('projectsValue');
+            elements.projectsLabel = document.getElementById('projectsLabel');
+            elements.actionCards = document.getElementById('actionCards');
+        }
+
+        function applyMobileView(isMobileView) {
+            if (isMobileView) {
+                document.body.classList.add('mobile-view');
+            } else {
+                document.body.classList.remove('mobile-view');
+            }
+        }
+
+        function updateUserName() {
+            if (elements.welcomeTitle) {
+                elements.welcomeTitle.textContent = 'Welcome, ' + state.userName + '!';
+            }
+        }
+
+        function updateStats() {
+            if (elements.experienceValue && state.stats.experience) elements.experienceValue.textContent = state.stats.experience.value;
+            if (elements.experienceLabel && state.stats.experience) elements.experienceLabel.textContent = state.stats.experience.label;
+            if (elements.membersValue && state.stats.members) elements.membersValue.textContent = state.stats.members.value;
+            if (elements.membersLabel && state.stats.members) elements.membersLabel.textContent = state.stats.members.label;
+            if (elements.skillsValue && state.stats.skills) elements.skillsValue.textContent = state.stats.skills.value;
+            if (elements.skillsLabel && state.stats.skills) elements.skillsLabel.textContent = state.stats.skills.label;
+            if (elements.projectsValue && state.stats.projects) elements.projectsValue.textContent = state.stats.projects.value;
+            if (elements.projectsLabel && state.stats.projects) elements.projectsLabel.textContent = state.stats.projects.label;
+        }
+
+        function render() {
+            updateUserName();
+            updateStats();
+        }
+
+        var shareIconDefault = '<svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M15 6.66797C16.3807 6.66797 17.5 5.54868 17.5 4.16797C17.5 2.78726 16.3807 1.66797 15 1.66797C13.6193 1.66797 12.5 2.78726 12.5 4.16797C12.5 5.54868 13.6193 6.66797 15 6.66797Z" stroke="#363740" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 12.5C6.38071 12.5 7.5 11.3807 7.5 10C7.5 8.61929 6.38071 7.5 5 7.5C3.61929 7.5 2.5 8.61929 2.5 10C2.5 11.3807 3.61929 12.5 5 12.5Z" stroke="#363740" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round"/><path d="M15 18.332C16.3807 18.332 17.5 17.2127 17.5 15.832C17.5 14.4513 16.3807 13.332 15 13.332C13.6193 13.332 12.5 14.4513 12.5 15.832C12.5 17.2127 13.6193 18.332 15 18.332Z" stroke="#363740" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round"/><path d="M7.15833 11.2578L12.85 14.5745" stroke="#363740" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round"/><path d="M12.8417 5.42578L7.15833 8.74245" stroke="#363740" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+        var shareIconCopied = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 16 16" fill="none"><path d="M3 10.1429L5.75 13L14 3" stroke="#0A090A" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+        function showShareCopiedState() {
+            var card = document.querySelector('.action-card[data-action="shareTeam"]');
+            if (!card) return;
+
+            var iconEl = card.querySelector('.action-icon');
+            var titleEl = card.querySelector('.action-text h3');
+            var descEl = card.querySelector('.action-text p');
+
+            if (iconEl) iconEl.innerHTML = shareIconCopied;
+            if (titleEl) titleEl.textContent = 'Copied!';
+            if (descEl) descEl.textContent = 'Link ready to share';
+
+            setTimeout(function() {
+                if (iconEl) iconEl.innerHTML = shareIconDefault;
+                if (titleEl) titleEl.textContent = 'Share Team';
+                if (descEl) descEl.textContent = 'Copy link to share';
+            }, 2000);
+        }
+
+        function handleActionClick(action) {
+            if (typeof window.myop_cta_handler === 'function') {
+                // Use parent window's location to get the actual query params
+                var parentSearch = '';
+                try {
+                    parentSearch = window.parent.location.search;
+                } catch (e) {
+                    // Cross-origin fallback
+                    parentSearch = window.location.search;
+                }
+                window.myop_cta_handler('action_clicked', {
+                    action: action,
+                    search: parentSearch
+                });
+            }
+        }
+
+        function attachEventListeners() {
+            // Re-cache actionCards in case it wasn't ready before
+            elements.actionCards = document.getElementById('actionCards');
+
+            if (!elements.actionCards) {
+                // Retry if element not found yet
+                setTimeout(attachEventListeners, 50);
+                return;
+            }
+            // Attach click handlers to each action card directly
+            var cards = elements.actionCards.querySelectorAll('.action-card');
+            cards.forEach(function(card) {
+                card.addEventListener('click', function() {
+                    handleActionClick(card.dataset.action);
+                });
+            });
+        }
+
+        function initializeComponent(data) {
+            // Ensure elements are cached (in case init hasn't run yet)
+            if (!elements.appRoot) {
+                cacheElements();
+            }
+
+            if (data) {
+                if (data.isMobileView !== undefined) {
+                    applyMobileView(data.isMobileView);
+                }
+                if (data.userName) state.userName = data.userName;
+                if (data.stats) state.stats = Object.assign({}, state.stats, data.stats);
+            }
+            render();
+        }
+
+        // Track if Myop has initialized the component
+        window.__myopInitCalled = false;
+
+        window.myop_init_interface = function(data) {
+            window.__myopInitCalled = true;
+
+            if (arguments.length === 0) {
+                return { userName: state.userName, stats: Object.assign({}, state.stats) };
+            }
+            if (data && data.action) {
+                switch (data.action) {
+                    case 'setUserName':
+                        if (data.payload) { state.userName = data.payload; updateUserName(); }
+                        break;
+                    case 'setStats':
+                        if (data.payload) { state.stats = Object.assign({}, state.stats, data.payload); updateStats(); }
+                        break;
+                    case 'updateStat':
+                        if (data.payload && data.payload.key && state.stats[data.payload.key]) {
+                            state.stats[data.payload.key] = { value: data.payload.value, label: data.payload.label || state.stats[data.payload.key].label };
+                            updateStats();
+                        }
+                        break;
+                    case 'showShareCopied':
+                        showShareCopiedState();
+                        break;
+                    default: console.warn('HeaderInsights: Unknown action:', data.action);
+                }
+                return;
+            }
+            initializeComponent(data);
+        };
+
+        window.myop_cta_handler = function(actionId, payload) { console.log('CTA Handler called:', actionId, payload); };
+
+        function init() {
+            cacheElements();
+            attachEventListeners();
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
+    })();
+</script>
+<script id="myop_preview">
+    // Preview script - only runs when testing locally, not in Myop
+    setTimeout(function() {
+        // Only show demo data if Myop hasn't initialized the component
+        if (!window.__myopInitCalled) {
+            window.myop_init_interface({
+                userName: 'Maya',
+                stats: {
+                    experience: { value: '5.2 yrs', label: 'Avg Experience' },
+                    members: { value: 12, label: 'Members' },
+                    skills: { value: 48, label: 'Skills' },
+                    projects: { value: 23, label: 'Projects' }
+                }
+            });
+            window.myop_cta_handler = function(actionId, payload) {
+                console.log('Demo CTA:', actionId, payload);
+            };
+        }
+    }, 100);
+</script>
+</body>
+
+</html>
