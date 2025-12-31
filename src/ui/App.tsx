@@ -1,7 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
-import {MyopComponent, preloadComponents} from "@myop/react";
-import { COMPONENTS_IDS } from '../utils/componentsIds';
-import { getComponentId, QUERY_PARAMS } from '../utils/queryParams';
+import { Signup } from "@myop/Signup";
 import { Route, Routes, useNavigate, useLocation } from 'react-router-dom';
 import {Analytics} from "./Analytics.tsx";
 import {HomePage} from "./HomePage.tsx";
@@ -18,7 +16,6 @@ function App() {
     const savedUser = localStorage.getItem(LOCAL_STORAGE_KEY);
     return savedUser ? JSON.parse(savedUser) : null;
   });
-  const [donePreload, setDonePreload] = useState(false);
   const [members, setMembers] = useState<TeamMember[]>(teamMembersData);
   const [isMobileView, setIsMobileView] = useState<boolean>(window.innerWidth <= MOBILE_BREAKPOINT);
   const [isSidebarExpanded, setIsSidebarExpanded] = useState(false);
@@ -55,39 +52,12 @@ function App() {
     };
 
     const handleNavigate = (navId: string) => {
-        const search = window.location.search;
         if (navId === 'home') {
-            navigate({ pathname: '/', search });
+            navigate('/');
         } else if (navId === 'analytics') {
-            navigate({ pathname: '/analytics', search });
+            navigate('/analytics');
         }
     };
-
-    useEffect(() => {
-        const params = new URLSearchParams(window.location.search);
-
-        // Separate IDs into default (from COMPONENTS_IDS) and override (from URL params)
-        const defaultIds: string[] = [];
-        const overrideIds: string[] = [];
-
-        Object.entries(QUERY_PARAMS).forEach(([key, paramName]) => {
-            const overrideId = params.get(paramName);
-            if (overrideId) {
-                overrideIds.push(overrideId);
-            } else {
-                const defaultId = COMPONENTS_IDS[key as keyof typeof COMPONENTS_IDS];
-                if (defaultId) {
-                    defaultIds.push(defaultId);
-                }
-            }
-        });
-
-        // Preload default IDs without preview, override IDs with preview=true
-        Promise.all([
-            defaultIds.length > 0 ? preloadComponents(defaultIds, 'production') : Promise.resolve(),
-            overrideIds.length > 0 ? preloadComponents(overrideIds, 'production', true) : Promise.resolve()
-        ]).then(() => setDonePreload(true));
-    }, [])
 
     useEffect(() => {
         const handleResize = () => {
@@ -101,15 +71,9 @@ function App() {
     }, [isMobileView]);
 
 
-    if(!donePreload) {
-        return (<div/>)
-    }
-
   if (!currentUser) {
-
     return (<div className="app-signup-container">
-        <MyopComponent
-          componentId={getComponentId(QUERY_PARAMS.signup)}
+        <Signup
           on={(actionId: string) => {
             if (actionId === 'google_signin' || actionId === 'email_signin' ||
                 actionId === 'google_signup' || actionId === 'email_signup') {

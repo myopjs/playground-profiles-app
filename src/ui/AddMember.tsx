@@ -1,5 +1,4 @@
-import {MyopComponent} from "@myop/react";
-import {getComponentId, QUERY_PARAMS} from "../utils/queryParams.ts";
+import { CreateProfile } from "@myop/CreateProfile";
 import {useNavigate} from "react-router-dom";
 import {useMemo} from "react";
 import type {TeamMember} from '../data/teamMembers.ts';
@@ -21,7 +20,7 @@ export const AddMember = ({members, onAddMember, isMobileView}: AddMemberProps) 
 
     const handleAddProfileCta = (action: string, payload: any): void => {
         if (action === 'cancel' || action === 'back') {
-            navigate({ pathname: '/', search: window.location.search });
+            navigate('/');
         }
         if (action === 'submit' && payload?.formData) {
             const formData = payload.formData;
@@ -45,14 +44,13 @@ export const AddMember = ({members, onAddMember, isMobileView}: AddMemberProps) 
                 relationshipType: 'Team member'
             };
             onAddMember(newMember);
-            navigate({ pathname: '/', search: window.location.search });
+            navigate('/');
         }
     };
 
     return (
         <div className="add-member-container">
-            <MyopComponent
-                componentId={getComponentId(QUERY_PARAMS.addProfile)}
+            <CreateProfile
                 data={{ managersList, isMobileView }}
                 on={handleAddProfileCta}
             />
