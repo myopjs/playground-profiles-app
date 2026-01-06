@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Profile</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { width: 100%; height: 100vh; overflow: hidden; background: transparent; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Inter', sans-serif; }
+        #app-root { height: 100%; }
+        .main-container { width: 100%; height: 100vh; position: relative; overflow-y: auto; background: #f8f9fa; }
+        .content-wrapper { max-width: 900px; margin: 0 auto; padding: 32px 24px; }
+        .header { background: white; padding: 20px 24px; border-bottom: 1px solid #e5e7eb; display: flex; align-items: center; gap: 16px; margin-bottom: 32px; border-radius: 12px; }
+        .back-button { width: 40px; height: 40px; border: none; background: #f3f4f6; border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; flex-shrink: 0; color: #374151; font-size: 20px; }
+        .back-button:hover { background: #e5e7eb; transform: translateX(-2px); }
+        .header-icon { width: 48px; height: 48px; background: rgba(237, 167, 247, 0.5); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #111827; font-size: 20px; flex-shrink: 0; }
+        .header-text h1 { font-size: 18px; font-weight: 600; color: #111827; margin-bottom: 2px; }
+        .header-text p { font-size: 14px; color: #6b7280; }
+        .section-card { background: white; border-radius: 12px; border: 1px solid #e5e7eb; padding: 32px; margin-bottom: 24px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); }
+        .section-title { font-size: 18px; font-weight: 600; color: #111827; margin-bottom: 8px; }
+        .section-subtitle { font-size: 14px; color: #6b7280; margin-bottom: 32px; }
+        .avatar-upload-section { margin-bottom: 32px; }
+        .avatar-label { font-size: 14px; font-weight: 500; color: #374151; margin-bottom: 12px; display: block; }
+        .avatar-container { display: flex; align-items: center; gap: 16px; }
+        .avatar-preview { position: relative; }
+        .avatar { width: 100px; height: 100px; border-radius: 50%; background: #e5e7eb; display: flex; align-items: center; justify-content: center; font-size: 40px; color: #9ca3af; overflow: hidden; }
+        .avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .avatar-upload-icon { position: absolute; bottom: 0; right: 0; width: 32px; height: 32px; background: white; border: 2px solid #e5e7eb; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; }
+        .avatar-upload-icon:hover { background: #f9fafb; transform: scale(1.05); }
+        .avatar-text p:first-child { font-size: 14px; color: #6b7280; margin-bottom: 4px; }
+        .avatar-text p:last-child { font-size: 12px; color: #9ca3af; }
+        .form-group { margin-bottom: 24px; }
+        .form-label { display: block; font-size: 14px; font-weight: 500; color: #374151; margin-bottom: 8px; }
+        .form-label.required::after { content: ' *'; color: #ef4444; }
+        .form-input, .form-select { width: 100%; padding: 10px 14px; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 14px; background: #f9fafb; color: #111827; transition: all 0.2s; font-family: inherit; }
+        .form-input:focus, .form-select:focus { outline: none; background: white; border-color: #06b6d4; }
+        .form-input::placeholder { color: #9ca3af; }
+        .form-hint { font-size: 12px; color: #6b7280; margin-top: 4px; }
+        .skills-input-group { display: flex; gap: 8px; margin-bottom: 8px; }
+        .skills-input { flex: 1; }
+        .add-skill-btn { padding: 10px 20px; background: #363740; border: none; border-radius: 8px; font-size: 14px; font-weight: 500; color: white; cursor: pointer; transition: all 0.2s; }
+        .add-skill-btn:hover { background: #2a2a32; }
+        .add-skill-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .skills-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; min-height: 20px; }
+        .skill-tag { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; background: #eceef2; border-radius: 6px; font-size: 13px; color: #374151; }
+        .skill-remove { background: none; border: none; color: #6b7280; font-size: 18px; cursor: pointer; padding: 0; width: 16px; height: 16px; display: flex; align-items: center; justify-content: center; border-radius: 50%; transition: all 0.2s; }
+        .skill-remove:hover { background: rgba(0, 0, 0, 0.1); color: #111827; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .action-buttons { display: flex; gap: 12px; margin-top: 32px; justify-content: flex-end; }
+        .btn { padding: 12px 24px; border: none; border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.2s; }
+        .btn-primary { background: #363740; color: white; }
+        .btn-primary:hover { background: #2a2a32; }
+        .btn-secondary { background: transparent; color: #6b7280; border: 1px solid #e5e7eb; }
+        .btn-secondary:hover { background: #f9fafb; color: #111827; }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .toast { position: fixed; bottom: 24px; right: 24px; background: #111827; color: white; padding: 14px 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); font-size: 14px; z-index: 1000; animation: slideIn 0.3s ease-out; }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @media (max-width: 768px) { .form-row { grid-template-columns: 1fr; } .content-wrapper { padding: 24px 16px; } .section-card { padding: 24px 16px; } }
+    </style>
+</head>
+<body>
+<div id="app-root">
+    <div class="main-container">
+        <div class="content-wrapper">
+            <div class="header">
+                <button class="back-button" id="backBtn" title="Go back">←</button>
+                <div class="header-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#374151" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6"/>
+                    </svg>
+                </div>
+                <div class="header-text">
+                    <h1>Add Team Member</h1>
+                    <p>Fill in the details to add a new team member</p>
+                </div>
+            </div>
+            <div class="section-card">
+                <h2 class="section-title">Profile Information</h2>
+                <p class="section-subtitle">Basic information about the team member</p>
+                <div class="avatar-upload-section">
+                    <label class="avatar-label">Profile Picture</label>
+                    <div class="avatar-container">
+                        <div class="avatar-preview">
+                            <div class="avatar" id="avatarPreview">?</div>
+                            <label class="avatar-upload-icon" for="avatarInput">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#374151" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/>
+                                </svg>
+                            </label>
+                            <input type="file" id="avatarInput" accept="image/*" style="display: none;">
+                        </div>
+                        <div class="avatar-text">
+                            <p>Upload a profile picture</p>
+                            <p>JPG or PNG. Max size of 5MB</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label required" for="fullName">Full Name</label>
+                    <input type="text" id="fullName" class="form-input" placeholder="John Doe">
+                </div>
+                <div class="form-group">
+                    <label class="form-label required" for="jobTitle">Job Title</label>
+                    <input type="text" id="jobTitle" class="form-input" placeholder="Product Designer">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label required" for="email">Email Address</label>
+                        <input type="email" id="email" class="form-input" placeholder="john@example.com">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label required" for="phone">Phone Number</label>
+                        <input type="tel" id="phone" class="form-input" placeholder="+1 (555) 123-4567">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label required" for="location">Location</label>
+                    <input type="text" id="location" class="form-input" placeholder="San Francisco, CA">
+                </div>
+            </div>
+            <div class="section-card">
+                <h2 class="section-title">Work Details</h2>
+                <p class="section-subtitle">Experience and organizational details</p>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label required" for="yearsExperience">Years of Experience</label>
+                        <input type="number" id="yearsExperience" class="form-input" placeholder="5" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label required" for="companyTenure">Company Tenure (Years)</label>
+                        <input type="number" id="companyTenure" class="form-input" placeholder="2" min="0">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label required" for="reportsTo">Reports To</label>
+                    <select id="reportsTo" class="form-select"><option value="">Select a manager</option></select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label required">Skills</label>
+                    <div class="skills-input-group">
+                        <input type="text" id="skillInput" class="form-input skills-input" placeholder="e.g., UI Design, Prototyping">
+                        <button type="button" id="addSkillBtn" class="add-skill-btn">Add Skill</button>
+                    </div>
+                    <p class="form-hint">Press Enter or click Add Skill to add multiple skills</p>
+                    <div id="skillsList" class="skills-list"></div>
+                </div>
+            </div>
+            <div class="action-buttons">
+                <button type="button" id="cancelBtn" class="btn btn-secondary">Cancel</button>
+                <button type="button" id="submitBtn" class="btn btn-primary">Add Team Member</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    (function() {
+        'use strict';
+        var state = {
+            formData: { fullName: '', jobTitle: '', email: '', phone: '', location: '', yearsExperience: '', companyTenure: '', reportsTo: '', skills: [], profilePicture: null },
+            managersList: [],
+            config: {}
+        };
+        var isInitialized = false;
+        var elements = {};
+
+        function cacheElements() {
+            elements.avatarPreview = document.getElementById('avatarPreview');
+            elements.avatarInput = document.getElementById('avatarInput');
+            elements.fullName = document.getElementById('fullName');
+            elements.jobTitle = document.getElementById('jobTitle');
+            elements.email = document.getElementById('email');
+            elements.phone = document.getElementById('phone');
+            elements.location = document.getElementById('location');
+            elements.yearsExperience = document.getElementById('yearsExperience');
+            elements.companyTenure = document.getElementById('companyTenure');
+            elements.reportsTo = document.getElementById('reportsTo');
+            elements.skillInput = document.getElementById('skillInput');
+            elements.addSkillBtn = document.getElementById('addSkillBtn');
+            elements.skillsList = document.getElementById('skillsList');
+            elements.backBtn = document.getElementById('backBtn');
+            elements.cancelBtn = document.getElementById('cancelBtn');
+            elements.submitBtn = document.getElementById('submitBtn');
+        }
+
+        function updateFormUI() {
+            if (elements.fullName) elements.fullName.value = state.formData.fullName || '';
+            if (elements.jobTitle) elements.jobTitle.value = state.formData.jobTitle || '';
+            if (elements.email) elements.email.value = state.formData.email || '';
+            if (elements.phone) elements.phone.value = state.formData.phone || '';
+            if (elements.location) elements.location.value = state.formData.location || '';
+            if (elements.yearsExperience) elements.yearsExperience.value = state.formData.yearsExperience || '';
+            if (elements.companyTenure) elements.companyTenure.value = state.formData.companyTenure || '';
+            if (elements.reportsTo) elements.reportsTo.value = state.formData.reportsTo || '';
+            updateAvatarPreview();
+            renderSkills();
+        }
+
+        function updateAvatarPreview() {
+            if (elements.avatarPreview) {
+                if (state.formData.profilePicture) {
+                    elements.avatarPreview.innerHTML = '<img src="' + state.formData.profilePicture + '" alt="Avatar">';
+                } else {
+                    elements.avatarPreview.innerHTML = '?';
+                }
+            }
+        }
+
+        function updateManagersDropdown() {
+            if (!elements.reportsTo) return;
+            var currentValue = elements.reportsTo.value;
+            elements.reportsTo.innerHTML = '<option value="">Select a manager</option>';
+            state.managersList.forEach(function(manager) {
+                var option = document.createElement('option');
+                option.value = typeof manager === 'object' ? manager.id : manager;
+                option.textContent = typeof manager === 'object' ? manager.name : manager;
+                elements.reportsTo.appendChild(option);
+            });
+            elements.reportsTo.value = currentValue;
+        }
+
+        function renderSkills() {
+            if (!elements.skillsList) return;
+            elements.skillsList.innerHTML = state.formData.skills.map(function(skill, index) {
+                return '<div class="skill-tag">' + skill + '<button type="button" class="skill-remove" data-index="' + index + '">×</button></div>';
+            }).join('');
+            elements.skillsList.querySelectorAll('.skill-remove').forEach(function(btn) {
+                btn.addEventListener('click', function() { removeSkill(parseInt(this.dataset.index)); });
+            });
+        }
+
+        function handleFieldChange(field, value) {
+            state.formData[field] = value;
+            if (typeof window.myop_cta_handler === 'function') {
+                window.myop_cta_handler('field_changed', { field: field, value: value, formData: Object.assign({}, state.formData) });
+            }
+        }
+
+        function addSkill() {
+            var skill = elements.skillInput.value.trim();
+            if (skill && state.formData.skills.indexOf(skill) === -1) {
+                state.formData.skills.push(skill);
+                renderSkills();
+                elements.skillInput.value = '';
+                if (typeof window.myop_cta_handler === 'function') {
+                    window.myop_cta_handler('skill_added', { skill: skill, skills: state.formData.skills.slice() });
+                }
+            }
+        }
+
+        function removeSkill(index) {
+            var removed = state.formData.skills.splice(index, 1)[0];
+            renderSkills();
+            if (typeof window.myop_cta_handler === 'function') {
+                window.myop_cta_handler('skill_removed', { skill: removed, skills: state.formData.skills.slice() });
+            }
+        }
+
+        function handleAvatarUpload(event) {
+            var file = event.target.files[0];
+            if (file) {
+                if (file.size > 5 * 1024 * 1024) {
+                    showToast('Image size should be less than 5MB');
+                    return;
+                }
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    state.formData.profilePicture = e.target.result;
+                    updateAvatarPreview();
+                    if (typeof window.myop_cta_handler === 'function') {
+                        window.myop_cta_handler('image_uploaded', { profilePicture: e.target.result });
+                    }
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function isValid() {
+            return state.formData.fullName && state.formData.jobTitle && state.formData.email && state.formData.phone && state.formData.location && state.formData.yearsExperience && state.formData.companyTenure && state.formData.reportsTo && state.formData.skills.length > 0;
+        }
+
+        function handleSubmit() {
+            if (!isValid()) {
+                showToast('Please fill in all required fields and add at least one skill');
+                return;
+            }
+            if (typeof window.myop_cta_handler === 'function') {
+                debugger;
+                window.myop_cta_handler('submit', { formData: Object.assign({}, state.formData) });
+            }
+        }
+
+        function handleCancel() {
+            if (typeof window.myop_cta_handler === 'function') {
+                window.myop_cta_handler('cancel', {});
+            }
+        }
+
+        function handleBack() {
+            debugger
+            if (typeof window.myop_cta_handler === 'function') {
+                window.myop_cta_handler('back', {});
+            }
+        }
+
+        function showToast(message) {
+            var existingToast = document.querySelector('.toast');
+            if (existingToast) existingToast.remove();
+            var toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(function() { toast.remove(); }, 3000);
+        }
+
+        function resetForm() {
+            state.formData = { fullName: '', jobTitle: '', email: '', phone: '', location: '', yearsExperience: '', companyTenure: '', reportsTo: '', skills: [], profilePicture: null };
+            updateFormUI();
+        }
+
+        function attachEventListeners() {
+            if (elements.backBtn) elements.backBtn.addEventListener('click', handleBack);
+            if (elements.avatarInput) elements.avatarInput.addEventListener('change', handleAvatarUpload);
+            if (elements.fullName) elements.fullName.addEventListener('input', function(e) { handleFieldChange('fullName', e.target.value); });
+            if (elements.jobTitle) elements.jobTitle.addEventListener('input', function(e) { handleFieldChange('jobTitle', e.target.value); });
+            if (elements.email) elements.email.addEventListener('input', function(e) { handleFieldChange('email', e.target.value); });
+            if (elements.phone) elements.phone.addEventListener('input', function(e) { handleFieldChange('phone', e.target.value); });
+            if (elements.location) elements.location.addEventListener('input', function(e) { handleFieldChange('location', e.target.value); });
+            if (elements.yearsExperience) elements.yearsExperience.addEventListener('input', function(e) { handleFieldChange('yearsExperience', e.target.value); });
+            if (elements.companyTenure) elements.companyTenure.addEventListener('input', function(e) { handleFieldChange('companyTenure', e.target.value); });
+            if (elements.reportsTo) elements.reportsTo.addEventListener('change', function(e) { handleFieldChange('reportsTo', e.target.value); });
+            if (elements.addSkillBtn) elements.addSkillBtn.addEventListener('click', addSkill);
+            if (elements.skillInput) elements.skillInput.addEventListener('keydown', function(e) { if (e.key === 'Enter') { e.preventDefault(); addSkill(); } });
+            if (elements.submitBtn) elements.submitBtn.addEventListener('click', handleSubmit);
+            if (elements.cancelBtn) elements.cancelBtn.addEventListener('click', handleCancel);
+        }
+
+        function applyMobileView(isMobileView) {
+            if (isMobileView) {
+                document.body.classList.add('mobile-view');
+            } else {
+                document.body.classList.remove('mobile-view');
+            }
+        }
+
+        function initializeComponent(data) {
+            if (data) {
+                if (data.isMobileView !== undefined) {
+                    applyMobileView(data.isMobileView);
+                }
+                if (data.formData) state.formData = Object.assign({}, state.formData, data.formData);
+                if (data.managersList) state.managersList = data.managersList;
+                if (data.config) state.config = data.config;
+            }
+            if (!isInitialized) {
+                attachEventListeners();
+                isInitialized = true;
+            }
+            updateManagersDropdown();
+            updateFormUI();
+        }
+
+        window.myop_init_interface = function(data) {
+            if (arguments.length === 0) {
+                return { formData: Object.assign({}, state.formData), managersList: state.managersList.slice(), config: Object.assign({}, state.config), isValid: isValid() };
+            }
+            if (data && data.action) {
+                switch (data.action) {
+                    case 'setFormData':
+                        if (data.payload) { state.formData = Object.assign({}, state.formData, data.payload); updateFormUI(); }
+                        break;
+                    case 'setManagersList':
+                        if (data.payload) { state.managersList = data.payload; updateManagersDropdown(); }
+                        break;
+                    case 'reset':
+                        resetForm();
+                        break;
+                    case 'showToast':
+                        if (data.payload) showToast(data.payload);
+                        break;
+                    default: console.warn('CreateProfile: Unknown action:', data.action);
+                }
+                return;
+            }
+            initializeComponent(data);
+        };
+
+        window.myop_cta_handler = function(actionId, payload) { console.log('CTA Handler called:', actionId, payload); };
+
+        function init() { cacheElements(); attachEventListeners(); isInitialized = true; console.log('CreateProfile component ready'); }
+        if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', init); } else { init(); }
+    })();
+</script>
+</body>
+</html>
